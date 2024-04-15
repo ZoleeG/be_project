@@ -4,6 +4,7 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const request = require("supertest");
 const { convertTimestampToDate } = require("../db/seeds/utils");
+const endpoints = require('../endpoints.json')
 
 beforeEach(() => seed(data));
 afterAll(() => db.end());
@@ -39,36 +40,7 @@ describe("GET /api", () => {
       .get("/api")
       .expect(200)
       .then((response) => {
-        const expected = {
-          "GET /api": {
-            description:
-              "serves up a json representation of all the available endpoints of the api",
-          },
-          "GET /api/topics": {
-            description: "serves an array of all topics",
-            queries: [],
-            exampleResponse: {
-              topics: [{ slug: "football", description: "Footie!" }],
-            },
-          },
-          "GET /api/articles": {
-            description: "serves an array of all articles",
-            queries: ["author", "topic", "sort_by", "order"],
-            exampleResponse: {
-              articles: [
-                {
-                  title: "Seafood substitutions are increasing",
-                  topic: "cooking",
-                  author: "weegembump",
-                  body: "Text from the article..",
-                  created_at: "2018-05-30T15:59:13.341Z",
-                  votes: 0,
-                  comment_count: 6,
-                },
-              ],
-            },
-          },
-        };
+        const expected = endpoints
         const { body } = response;
         expect(body).toMatchObject(expected);
       });
