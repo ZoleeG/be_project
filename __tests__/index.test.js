@@ -15,19 +15,35 @@ describe("GET /api/topics", () => {
       .then(({ body }) => {
         const { topics } = body;
         expect(topics.length).toBe(3);
-        topics.forEach((topic)=>{
-            expect(typeof topic.slug).toBe('string')
-            expect(typeof topic.description).toBe('string')
-        })
+        topics.forEach((topic) => {
+          expect(typeof topic.slug).toBe("string");
+          expect(typeof topic.description).toBe("string");
+        });
       });
   });
-  it('GET: 400 should respond with an error when the url is incorrect', () => {
+});
+
+describe("GET /api", () => {
+  it("GET: 200 should respond with an object describing all the available endpoints on our API", () => {
     return request(app)
-      .get("/api/twopics")
-      .expect(400)
+      .get("/api")
+      .expect(200)
       .then((response) => {
-        expect(response.badRequest).toBe(true)
-        expect(response._body.msg).toBe('Bad request')
-      })
+        const expected = ["GET /api", "GET /api/topics", "GET /api/articles"];
+        const { body } = response;
+        const actual = Object.keys(body);
+        expect(actual).toMatchObject(expected);
+      });
   });
+});
+
+describe('Error: invalid_path', () => {
+    it("GET: 404 should respond with an error when the url is incorrect", () => {
+        return request(app)
+          .get("/api/twopics")
+          .expect(404)
+          .then((response) => {
+            expect(response.body.msg).toBe("Invalid path");
+          });
+      });
 });
