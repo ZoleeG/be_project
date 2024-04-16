@@ -34,12 +34,7 @@ exports.selectAllArticles = () => {
 };
 
 exports.selectCommentsById = (article_id) => {
-  const regex = /\D/;
-  const isNonDigit = regex.test(article_id);
-  if (article_id <= 0 || isNonDigit) {
-    return Promise.reject({ status: 400, msg: "Bad request" });
-  }
-
+  
   const queryStr = `SELECT * FROM comments WHERE comments.article_id = $1 ORDER BY comments.created_at DESC;`;
 
   return db.query(queryStr, [article_id]).then(({ rows }) => {
@@ -67,20 +62,7 @@ exports.checkArticlesExists = () => {
 
 exports.addCommentById = (newComment, article_id) => {
   const { username, body } = newComment;
-  const regex = /\D/;
-  const isNonDigit = regex.test(article_id);
-  if (article_id <= 0 || isNonDigit) {
-    return Promise.reject({ status: 400, msg: "Bad request" });
-  }
-  if (
-    typeof username !== "string" ||
-    username.toUpperCase() === username.toLowerCase()
-  ) {
-    return Promise.reject({ status: 400, msg: "Bad request" });
-  }
-  if (typeof body !== "string" || body.toUpperCase() === body.toLowerCase()) {
-    return Promise.reject({ status: 400, msg: "Bad request" });
-  }
+  
   const queryStr = format(
     `INSERT INTO comments (body, author, article_id) VALUES %L RETURNING * ;`,
     [[body, username, article_id]]
@@ -89,3 +71,17 @@ exports.addCommentById = (newComment, article_id) => {
     return rows;
   });
 };
+
+exports.updateVotesById = (instructions, article_id) => {
+    const { inc_votes } = instructions;
+    if (![-100, 1].includes(inc_votes)) {
+        return Promise.reject({ status: 400, msg: "Bad request" });
+      }
+    const increment=`votes+${inc_votes}`
+
+    const queryStr = format(
+      `UPDATE articles SET votes=%s WHERE article_id=%s RETURNING * ;`,increment, article_id)
+    return db.query(queryStr).then(({ rows }) => {
+      return rows;
+    });
+  };

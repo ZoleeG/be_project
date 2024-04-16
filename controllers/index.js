@@ -1,4 +1,4 @@
-const {selectTopics, selectArticleById, selectAllArticles, selectCommentsById, checkArticleExists, checkArticlesExists, addCommentById} = require('../models')
+const {selectTopics, selectArticleById, selectAllArticles, selectCommentsById, checkArticleExists, checkArticlesExists, addCommentById, updateVotesById} = require('../models')
 
 exports.getTopics = (req, res, next) => {
   selectTopics().then((topics) => {
@@ -38,6 +38,16 @@ exports.postCommentById = (req, res, next) => {
     addCommentById(body,article_id)
     .then((newComment) => {
         res.status(201).send({ newComment });
+    })
+    .catch(next);
+}
+
+exports.patchVotesById = (req, res, next) => {
+    const {body} = req
+    const {article_id} = req.params
+    updateVotesById(body,article_id)
+    .then((updatedArticle) => {
+        res.status(200).send({ updatedArticle });
     })
     .catch(next);
 }
