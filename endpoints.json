@@ -9,23 +9,6 @@
       "topics": [{ "slug": "football", "description": "Footie!" }]
     }
   },
-  "GET /api/articles": {
-    "description": "serves an array of all articles",
-    "queries": ["author", "topic", "sort_by", "order"],
-    "exampleResponse": {
-      "articles": [
-        {
-          "title": "Seafood substitutions are increasing",
-          "topic": "cooking",
-          "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": "2018-05-30T15:59:13.341Z",
-          "votes": 0,
-          "comment_count": 6
-        }
-      ]
-    }
-  },
   "GET /api/articles/:article_id": {
     "description": "serves one article selected by id",
     "parameter": ["article_id"],
@@ -42,6 +25,25 @@
           "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
       }
       
+    }
+  },
+  "GET /api/articles": {
+    "description": "serves an array of all articles sorted by date in descending order, where each article has the attributes as shown in below example",
+    "queries": [],
+    "exampleResponse": {
+      "articles": [
+        {
+          "article_id": 5,
+          "title": "UNCOVERED: catspiracy to bring down democracy",
+          "topic": "cats",
+          "author": "rogersop",
+          "created_at": "2020-08-03T13:14:00.000Z",
+          "votes": "17",
+          "article_img_url":
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          "comment_count": "2"
+        }
+      ]
     }
   }
 }

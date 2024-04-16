@@ -4,7 +4,7 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const request = require("supertest");
 const { convertTimestampToDate } = require("../db/seeds/utils");
-const endpoints = require('../endpoints.json')
+const endpoints = require("../endpoints.json");
 
 beforeEach(() => seed(data));
 afterAll(() => db.end());
@@ -40,7 +40,7 @@ describe("GET /api", () => {
       .get("/api")
       .expect(200)
       .then((response) => {
-        const expected = endpoints
+        const expected = endpoints;
         const { body } = response;
         expect(body).toMatchObject(expected);
       });
@@ -96,7 +96,7 @@ describe("GET /api/articles/:article_id", () => {
         });
     });
   });
-  describe("GET 404: valid input but too high", () => {
+  describe("GET 404: correct form of input but too high", () => {
     it("if the input number is too high", () => {
       return request(app)
         .get("/api/articles/1116")
@@ -105,5 +105,64 @@ describe("GET /api/articles/:article_id", () => {
           expect(response.body.msg).toBe("No id found, number too high");
         });
     });
+  });
+});
+describe("GET /api/articles", () => {
+  it("GET 200: should serve an array of all articles, where each has the following attributes: author, title, article_id, topic, created_at, votes, article_img_url, comment_count", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const {articles} = body
+        console.log(articles[2]);
+        const actual = articles[2];
+        const expected = {
+          article_id: 5,
+          title: "UNCOVERED: catspiracy to bring down democracy",
+          topic: "cats",
+          author: "rogersop",
+          created_at: '2020-08-03T13:14:00.000Z',
+          votes: '17',
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          comment_count: '2',
+        };
+        expect(actual).toMatchObject(expected);
+      });
+  });
+  it("they need to be sorted by created_at date in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const {articles} = body
+        const expectedSortBy = "created_at"
+        const expectedOrder = {descending: true, coerce: true}
+        expect(articles).toBeSortedBy(expectedSortBy,expectedOrder);
+      });
+  });
+  it("there should not be a body property present on any of the article objects", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const {articles} = body
+        const actual = articles[2];
+        const expected = {
+          article_id: 5,
+          title: "UNCOVERED: catspiracy to bring down democracy",
+          topic: "cats",
+          author: "rogersop",
+          created_at: '2020-08-03T13:14:00.000Z',
+          votes: '17',
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          comment_count: '2',
+        };
+        expect(actual).toMatchObject(expected);
+      });
   });
 });
