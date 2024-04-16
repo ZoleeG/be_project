@@ -197,7 +197,6 @@ describe("GET /api/articles/:article_id/comments", () => {
         const { body } = response;
         const { comments } = body;
         const length = comments.length;
-        console.log(comments);
 
         expect(length).toBe(2);
 
@@ -259,6 +258,40 @@ describe("GET /api/articles/:article_id/comments", () => {
         const { msg } = body;
 
         expect(msg).toBe("Bad request");
+      });
+  });
+});
+describe('POST /api/articles/:article_id/comments', () => {
+  it('POST 201: adds comment to an article and responds with the posted comment', () => {
+    const inputBody = {
+      username: "lurker",
+      body: "Excellent work from the author"
+    };
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(inputBody)
+      .expect(201)
+      .then(({ body }) => {
+        const { newComment } = body;
+        const expected = {
+          body: "Excellent work from the author",
+          article_id: 2,
+          author: 'lurker'
+        }
+        expect(...newComment).toMatchObject(expected);
+      });
+  });
+  it('POST 400: if the inputBody is not in the correct form', () => {
+    const inputBody = {
+      username: 5,
+      body: "Excellent work"
+    };
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(inputBody)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad request")
       });
   });
 });
