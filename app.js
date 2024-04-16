@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const { getTopics, getArticleById, getAllArticles, getCommentsById } = require("./controllers/get_topics");
+const { getTopics, getArticleById, getAllArticles, getCommentsById } = require("./controllers");
 const endpoints = require("./endpoints.json");
 
 app.use(express.json());
@@ -21,6 +21,16 @@ app.get("/api/articles/:article_id/comments", getCommentsById)
 
 app.all("*", (req, res, next) => {
   res.status(404).send({ msg: "Invalid path" });
+});
+
+app.use((err, req, res, next) => {
+  if (err.code === "22P02") {
+    res.status(400).send({ msg: "Bad request" });
+  }
+  if (err.code === "23502") {
+    res.status(400).send({ msg: "Bad request" });
+  }
+  next(err);
 });
 
 app.use((err, req, res, next) => {

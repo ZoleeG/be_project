@@ -68,31 +68,29 @@ describe("GET /api/articles/:article_id", () => {
         expect(actual).toMatchObject(expected);
       });
   });
-  describe("GET 404: should respond with an error if the input parameter is invalid", () => {
+  describe("GET 400: should respond with a 'bad request' error if the input parameter is invalid", () => {
     it("if it is a negative number or zero", () => {
       return request(app)
         .get("/api/articles/-50")
-        .expect(404)
+        .expect(400)
         .then((response) => {
-          expect(response.body.msg).toBe(
-            "Invalid input, article_id cannot be zero or negative"
-          );
+          expect(response.body.msg).toBe("Bad request");
         });
     });
     it("if not a number", () => {
       return request(app)
         .get("/api/articles/hi")
-        .expect(404)
+        .expect(400)
         .then((response) => {
-          expect(response.body.msg).toBe("Invalid input for type integer");
+          expect(response.body.msg).toBe("Bad request");
         });
     });
     it("if not an integer number", () => {
       return request(app)
         .get("/api/articles/3.14")
-        .expect(404)
+        .expect(400)
         .then((response) => {
-          expect(response.body.msg).toBe("Invalid input for type integer");
+          expect(response.body.msg).toBe("Bad request");
         });
     });
   });
@@ -102,7 +100,7 @@ describe("GET /api/articles/:article_id", () => {
         .get("/api/articles/1116")
         .expect(404)
         .then((response) => {
-          expect(response.body.msg).toBe("No id found, number too high");
+          expect(response.body.msg).toBe("Article not found");
         });
     });
   });
@@ -114,20 +112,42 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then((response) => {
         const { body } = response;
-        const {articles} = body
-        const actual = articles[2];
-        const expected = {
-          article_id: 5,
-          title: "UNCOVERED: catspiracy to bring down democracy",
-          topic: "cats",
-          author: "rogersop",
-          created_at: '2020-08-03T13:14:00.000Z',
-          votes: '17',
-          article_img_url:
-            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-          comment_count: '2',
-        };
-        expect(actual).toMatchObject(expected);
+        const { articles } = body;
+        const length = articles.length;
+
+        expect(length).toBe(5);
+
+        articles.forEach((article) => {
+          expect(Object.keys(article).length).toBe(8);
+          expect(Object.keys(article)).toEqual([
+            "author",
+            "title",
+            "article_id",
+            "topic",
+            "created_at",
+            "article_img_url",
+            "comment_count",
+            "votes",
+          ]);
+          const {
+            author,
+            title,
+            article_id,
+            topic,
+            created_at,
+            votes,
+            article_img_url,
+            comment_count,
+          } = article;
+          expect(typeof author).toBe("string");
+          expect(typeof title).toBe("string");
+          expect(typeof article_id).toBe("number");
+          expect(typeof topic).toBe("string");
+          expect(typeof created_at).toBe("string");
+          expect(typeof votes).toBe("string");
+          expect(typeof article_img_url).toBe("string");
+          expect(typeof comment_count).toBe("string");
+        });
       });
   });
   it("they need to be sorted by created_at date in descending order", () => {
@@ -136,10 +156,13 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then((response) => {
         const { body } = response;
-        const {articles} = body
-        const expectedSortBy = "created_at"
-        const expectedOrder = {descending: true, coerce: true}
-        expect(articles).toBeSortedBy(expectedSortBy,expectedOrder);
+        const { articles } = body;
+        const length = articles.length;
+        expect(length).toBe(5);
+
+        const expectedSortBy = "created_at";
+        const expectedOrder = { descending: true, coerce: true };
+        expect(articles).toBeSortedBy(expectedSortBy, expectedOrder);
       });
   });
   it("there should not be a body property present on any of the article objects", () => {
@@ -148,86 +171,94 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then((response) => {
         const { body } = response;
-        const {articles} = body
+        const { articles } = body;
         const actual = articles[2];
         const expected = {
           article_id: 5,
           title: "UNCOVERED: catspiracy to bring down democracy",
           topic: "cats",
           author: "rogersop",
-          created_at: '2020-08-03T13:14:00.000Z',
-          votes: '17',
+          created_at: "2020-08-03T13:14:00.000Z",
+          votes: "17",
           article_img_url:
             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-          comment_count: '2',
+          comment_count: "2",
         };
-        expect(actual).toMatchObject(expected);
+        expect(actual).toEqual(expected);
       });
   });
 });
-describe('GET /api/articles/:article_id/comments', () => {
-  it('GET 200: should respond with an array of comments for the given article_id, where each comment should have the following properties: comment_id, votes, created_at, author, body, article_id', () => {
+describe("GET /api/articles/:article_id/comments", () => {
+  it("GET 200: should respond with an array of comments for the given article_id, where each comment should have the following properties: comment_id, votes, created_at, author, body, article_id", () => {
     return request(app)
       .get("/api/articles/5/comments")
       .expect(200)
       .then((response) => {
         const { body } = response;
-        const {comments} = body
-        const actual = comments;
-        const expected = [
-      {
-        comment_id: 15,
-        body: "I am 100% sure that we're not completely sure.",
-        article_id: 5,
-        author: 'butter_bridge',
-        votes: 1,
-        created_at: '2020-11-24T00:08:00.000Z'
-      },
-      {
-        comment_id: 14,
-        body: 'What do you see? I have no idea where this will lead us. This place I speak of, is known as the Black Lodge.',
-        article_id: 5,
-        author: 'icellusedkars',
-        votes: 16,
-        created_at: '2020-06-09T05:00:00.000Z'
-      }
-    ]
-        expect(actual).toMatchObject(expected);
+        const { comments } = body;
+        const length = comments.length;
+        console.log(comments);
+
+        expect(length).toBe(2);
+
+        comments.forEach((comment) => {
+          expect(Object.keys(comment).length).toBe(6);
+          expect(Object.keys(comment)).toEqual(['comment_id', 'body', 'article_id', 'author', 'votes', 'created_at']);
+          const { comment_id, votes, created_at, author, body, article_id } =
+            comment;
+          expect(typeof comment_id).toBe("number");
+          expect(typeof votes).toBe("number");
+          expect(typeof created_at).toBe("string");
+          expect(typeof author).toBe("string");
+          expect(typeof body).toBe("string");
+          expect(typeof article_id).toBe("number");
+        });
       });
   });
-  it('the comments should be sorted by their created_at attribute in descending order', () => {
+  it("the comments should be sorted by their created_at attribute in descending order", () => {
     return request(app)
       .get("/api/articles/5/comments")
       .expect(200)
       .then((response) => {
         const { body } = response;
-        const {comments} = body
+        const { comments } = body;
         const actual = comments;
-        const expectedSortBy = "created_at"
-        const expectedOrder = {descending: true, coerce: true}
-        expect(actual).toBeSortedBy(expectedSortBy,expectedOrder);
-      })
+        const expectedSortBy = "created_at";
+        const expectedOrder = { descending: true, coerce: true };
+        expect(actual).toBeSortedBy(expectedSortBy, expectedOrder);
+      });
   });
-  it('GET 200: should respond with an empty array when the given article exists but has no comment', () => {
+  it("GET 200: should respond with an empty array when the given article exists but has no comment", () => {
     return request(app)
       .get("/api/articles/8/comments")
       .expect(200)
       .then((response) => {
         const { body } = response;
-        const {comments} = body
-        
-        expect(comments.length).toBe(0)
-      })
+        const { comments } = body;
+
+        expect(comments.length).toBe(0);
+      });
   });
-  it('GET 404: not found if article does not exists', () => {
+  it("GET 404: not found if article does not exists", () => {
     return request(app)
       .get("/api/articles/1113/comments")
       .expect(404)
       .then((response) => {
         const { body } = response;
-        const {msg} = body
-        
-        expect(msg).toBe("article not found")
-      })
+        const { msg } = body;
+
+        expect(msg).toBe("Article not found");
+      });
+  });
+  it('GET 400: bad request if request is of incorrect datatype', () => {
+    return request(app)
+      .get("/api/articles/onetwothree/comments")
+      .expect(400)
+      .then((response) => {
+        const { body } = response;
+        const { msg } = body;
+
+        expect(msg).toBe("Bad request");
+      });
   });
 });

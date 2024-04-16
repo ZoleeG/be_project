@@ -1,4 +1,4 @@
-const {selectTopics, selectArticleById, selectAllArticles, selectCommentsById, checkArticleExists} = require('../models/get_topics')
+const {selectTopics, selectArticleById, selectAllArticles, selectCommentsById, checkArticleExists, checkArticlesExists} = require('../models')
 
 exports.getTopics = (req, res, next) => {
   selectTopics().then((topics) => {
@@ -16,7 +16,8 @@ exports.getArticleById = (req, res, next) => {
 }
 
 exports.getAllArticles = (req, res, next) => {
-    selectAllArticles().then((articles) => {
+    Promise.all([selectAllArticles(), checkArticlesExists()])
+    .then(([articles]) => {
         res.status(200).send({ articles });
     })
     .catch(next);
