@@ -283,11 +283,61 @@ describe('POST /api/articles/:article_id/comments', () => {
   });
   it('POST 400: if the inputBody is not in the correct form', () => {
     const inputBody = {
-      username: 5,
+      username: 'fgf',
       body: "Excellent work"
     };
     return request(app)
       .post("/api/articles/2/comments")
+      .send(inputBody)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad request")
+      });
+  });
+});
+describe('PATCH /api/articles/:article_id', () => {
+  it('PATCH 200: should update the selected article in accordance with the input body, where { inc_votes : 1 } would increment the current article\'s vote property by 1', () => {
+    const inputBody = {
+      inc_votes: 1
+    };
+    return request(app)
+      .patch("/api/articles/2")
+      .send(inputBody)
+      .expect(200)
+      .then(({ body }) => {
+        const { updatedArticle } = body;
+        const expected = {
+        article_id: 2,
+        title: 'Sony Vaio; or, The Laptop',
+        votes: 1
+      }
+        expect(...updatedArticle).toMatchObject(expected);
+      });
+  });
+  it('PATCH 200: { inc_votes : -100 } would decrement the current article\'s vote property by 100', () => {
+    const inputBody = {
+      inc_votes: -100
+    };
+    return request(app)
+      .patch("/api/articles/2")
+      .send(inputBody)
+      .expect(200)
+      .then(({ body }) => {
+        const { updatedArticle } = body;
+        const expected = {
+        article_id: 2,
+        title: 'Sony Vaio; or, The Laptop',
+        votes: -100
+      }
+        expect(...updatedArticle).toMatchObject(expected);
+      });
+  });
+  it('PATCH 400: bad request error is thrown if inc_votes different from -100 or 1', () => {
+    const inputBody = {
+      inc_votes: "1"
+    };
+    return request(app)
+      .patch("/api/articles/2")
       .send(inputBody)
       .expect(400)
       .then((res) => {
