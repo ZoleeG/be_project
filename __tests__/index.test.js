@@ -115,7 +115,6 @@ describe("GET /api/articles", () => {
       .then((response) => {
         const { body } = response;
         const {articles} = body
-        console.log(articles[2]);
         const actual = articles[2];
         const expected = {
           article_id: 5,
@@ -164,5 +163,71 @@ describe("GET /api/articles", () => {
         };
         expect(actual).toMatchObject(expected);
       });
+  });
+});
+describe('GET /api/articles/:article_id/comments', () => {
+  it('GET 200: should respond with an array of comments for the given article_id, where each comment should have the following properties: comment_id, votes, created_at, author, body, article_id', () => {
+    return request(app)
+      .get("/api/articles/5/comments")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const {comments} = body
+        const actual = comments;
+        const expected = [
+      {
+        comment_id: 15,
+        body: "I am 100% sure that we're not completely sure.",
+        article_id: 5,
+        author: 'butter_bridge',
+        votes: 1,
+        created_at: '2020-11-24T00:08:00.000Z'
+      },
+      {
+        comment_id: 14,
+        body: 'What do you see? I have no idea where this will lead us. This place I speak of, is known as the Black Lodge.',
+        article_id: 5,
+        author: 'icellusedkars',
+        votes: 16,
+        created_at: '2020-06-09T05:00:00.000Z'
+      }
+    ]
+        expect(actual).toMatchObject(expected);
+      });
+  });
+  it('the comments should be sorted by their created_at attribute in descending order', () => {
+    return request(app)
+      .get("/api/articles/5/comments")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const {comments} = body
+        const actual = comments;
+        const expectedSortBy = "created_at"
+        const expectedOrder = {descending: true, coerce: true}
+        expect(actual).toBeSortedBy(expectedSortBy,expectedOrder);
+      })
+  });
+  it('GET 200: should respond with an empty array when the given article exists but has no comment', () => {
+    return request(app)
+      .get("/api/articles/8/comments")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const {comments} = body
+        
+        expect(comments.length).toBe(0)
+      })
+  });
+  it('GET 404: not found if article does not exists', () => {
+    return request(app)
+      .get("/api/articles/1113/comments")
+      .expect(404)
+      .then((response) => {
+        const { body } = response;
+        const {msg} = body
+        
+        expect(msg).toBe("article not found")
+      })
   });
 });
