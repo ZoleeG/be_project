@@ -1,4 +1,4 @@
-const {selectTopics, selectArticleById, selectAllArticles, selectCommentsById, checkArticleExists, checkArticlesExists} = require('../models')
+const {selectTopics, selectArticleById, selectAllArticles, selectCommentsById, checkArticleExists, checkArticlesExists, addCommentById} = require('../models')
 
 exports.getTopics = (req, res, next) => {
   selectTopics().then((topics) => {
@@ -28,6 +28,16 @@ exports.getCommentsById = (req, res, next) => {
     Promise.all([selectCommentsById(article_id), checkArticleExists(article_id)])
     .then(([comments]) => {
         res.status(200).send({ comments });
+    })
+    .catch(next);
+}
+
+exports.postCommentById = (req, res, next) => {
+    const {body} = req
+    const {article_id} = req.params
+    addCommentById(body,article_id)
+    .then((newComment) => {
+        res.status(201).send({ newComment });
     })
     .catch(next);
 }

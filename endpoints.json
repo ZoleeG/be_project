@@ -69,5 +69,22 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "Adds a new comment to an article and responds with the posted comment",
+    "queries": [],
+    "parameter": ["article_id"],
+    "exampleResponse": {
+      "newComment": [
+        {
+          "comment_id": 19,
+          "body": "Excellent work from the author",
+          "article_id": 2,
+          "author": "lurker",
+          "votes": 0,
+          "created_at": "2020-11-24T00:08:00.000Z"
+        }
+      ]
+    }
   }
 }
