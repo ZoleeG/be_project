@@ -86,7 +86,6 @@ exports.addCommentById = (newComment, article_id) => {
     [[body, username, article_id]]
   );
   return db.query(queryStr).then(({ rows }) => {
-    console.log(rows);
     return rows;
   });
 };
