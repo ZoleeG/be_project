@@ -375,3 +375,38 @@ describe('DELETE /api/comments/:comment_id', () => {
       });
   });
 });
+describe('GET /api/users', () => {
+  it('GET 200: should respond with an array of objects, each object should have the following properties: username, name, avatar_url', () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { users } = body;
+        const length = users.length;
+
+        expect(length).toBe(4);
+
+        users.forEach((user) => {
+          expect(Object.keys(user).length).toBe(3);
+          expect(Object.keys(user)).toEqual(['username', 'name', 'avatar_url']);
+          const { username, name, avatar_url} =
+            user;
+          expect(typeof username).toBe("string");
+          expect(typeof name).toBe("string");
+          expect(typeof avatar_url).toBe("string");
+        });
+      });
+  });
+  it('GET 404: should throw an error "Invalid path" if address is incorrect', () => {
+    return request(app)
+      .get("/api/usher")
+      .expect(404)
+      .then((response) => {
+        const { body } = response;
+        const { msg } = body;
+
+        expect(msg).toBe("Invalid path");
+      });
+  });
+});
