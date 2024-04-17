@@ -29,7 +29,7 @@
   },
   "GET /api/articles": {
     "description": "serves an array of all articles sorted by date in descending order, where each article has the attributes as shown in below example",
-    "queries": [],
+    "queries": ["topic"],
     "exampleResponse": {
       "articles": [
         {

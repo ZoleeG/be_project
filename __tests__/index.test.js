@@ -477,9 +477,72 @@ describe("GET /api/users", () => {
         const { body } = response;
         const { users } = body;
         const length = users.length;
-        const {userData} = data
+        const { userData } = data;
         expect(length).toBe(4);
-        expect(users).toMatchObject(userData)
+        expect(users).toMatchObject(userData);
+      });
+  });
+});
+describe("GET /api/articles?topic=", () => {
+  it("GET 200: should accept a topic query, and respond with a filtered set of articles according to it", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { articles } = body;
+        const length = articles.length;
+        expect(length).toBe(4);
+
+        articles.forEach((article) => {
+          expect(Object.keys(article).length).toBe(8);
+          expect(Object.keys(article)).toEqual([
+            "author",
+            "title",
+            "article_id",
+            "topic",
+            "created_at",
+            "article_img_url",
+            "comment_count",
+            "votes",
+          ]);
+          const {
+            author,
+            title,
+            article_id,
+            topic,
+            created_at,
+            votes,
+            article_img_url,
+            comment_count,
+          } = article;
+          expect(typeof author).toBe("string");
+          expect(typeof title).toBe("string");
+          expect(typeof article_id).toBe("number");
+          expect(typeof topic).toBe("string");
+          expect(typeof created_at).toBe("string");
+          expect(typeof votes).toBe("string");
+          expect(typeof article_img_url).toBe("string");
+          expect(typeof comment_count).toBe("string");
+        });
+      });
+  });
+  it("GET 404: if topic does not exist", () => {
+    return request(app)
+      .get("/api/articles?topic=55")
+      .expect(404)
+      .then(({body}) => {
+        const expected = "Not found";
+        expect(body.msg).toEqual(expected)
+      });
+  });
+  it("GET 400: if query key is incorrect", () => {
+    return request(app)
+      .get("/api/articles?tok=mitch")
+      .expect(400)
+      .then(({body}) => {
+        const expected = "Bad request";
+        expect(body.msg).toEqual(expected)
       });
   });
 });
