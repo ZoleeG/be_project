@@ -16,10 +16,22 @@ exports.selectArticleById = (article_id) => {
   });
 };
 
-exports.selectAllArticles = () => {
-  const queryStr = `SELECT articles.author, title, articles.article_id, topic, articles.created_at, article_img_url, COUNT(comments.article_id) AS comment_count, SUM(comments.votes) AS votes FROM articles JOIN comments ON articles.article_id=comments.article_id GROUP BY articles.article_id ORDER BY articles.created_at;`;
+exports.selectAllArticles = (query) => {
+  if (Object.keys(query)[0] && ![ 'topic' ].includes(Object.keys(query)[0])) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+  const { topic } = query
+  let queryStr = 'SELECT articles.author, title, articles.article_id, topic, articles.created_at, article_img_url, COUNT(comments.article_id) AS comment_count, SUM(comments.votes) AS votes FROM articles JOIN comments ON articles.article_id=comments.article_id ';
 
+  if(topic){
+    queryStr+=format('WHERE topic=%L ', topic)
+  }
+
+  queryStr += 'GROUP BY articles.article_id ORDER BY articles.created_at;'
   return db.query(queryStr).then(({ rows }) => {
+    if(rows.length===0){
+      return Promise.reject({ status: 404, msg: "Not found" });
+    }
     return rows;
   });
 };
