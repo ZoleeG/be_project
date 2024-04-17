@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const { getTopics, getArticleById, getAllArticles, getCommentsById, postCommentById, patchVotesById } = require("./controllers");
+const { getTopics, getArticleById, getAllArticles, getCommentsById, postCommentById, patchVotesById, removeCommentById } = require("./controllers");
 const endpoints = require("./endpoints.json");
 
 app.use(express.json());
@@ -20,6 +20,8 @@ app.get("/api/articles/:article_id/comments", getCommentsById)
 app.post("/api/articles/:article_id/comments", postCommentById)
 
 app.patch("/api/articles/:article_id",patchVotesById)
+
+app.delete("/api/comments/:comment_id", removeCommentById)
 
 app.all("*", (req, res, next) => {
   res.status(404).send({ msg: "Invalid path" });
