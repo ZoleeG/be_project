@@ -10,7 +10,7 @@ exports.selectTopics = () => {
 };
 
 exports.selectArticleById = (article_id) => {
-  const queryStr = `SELECT * FROM articles WHERE article_id=$1;`;
+  const queryStr = `SELECT articles.article_id, title , topic, articles.author, articles.body, articles.created_at, articles.votes, article_img_url, COUNT(articles.article_id) AS comment_count FROM articles JOIN comments ON comments.article_id=articles.article_id WHERE comments.article_id=$1 GROUP BY articles.article_id;`;
   return db.query(queryStr, [article_id]).then(({ rows }) => {
     return rows[0];
   });

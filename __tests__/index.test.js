@@ -546,3 +546,27 @@ describe("GET /api/articles?topic=", () => {
       });
   });
 });
+describe('GET /api/articles/:article_id', () => {
+  it("GET 200: an article response object should also now include comment_count, which is the total count of all the comments with this article_id", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then((response) => {
+        const expected = {
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 100,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          comment_count: "11",
+        };
+        const { body } = response;
+        const actual = body.article;
+        expect(actual).toMatchObject(expected);
+      });
+  });
+});
