@@ -9,7 +9,7 @@ exports.getTopics = (req, res, next) => {
 
 exports.getArticleById = (req, res, next) => {
     const {article_id} = req.params
-    selectArticleById(article_id).then((article) => {
+    Promise.all([selectArticleById(article_id), checkArticleExists(article_id)]).then(([article]) => {
         res.status(200).send({ article });
     })
     .catch(next);
@@ -45,8 +45,8 @@ exports.postCommentById = (req, res, next) => {
 exports.patchVotesById = (req, res, next) => {
     const {body} = req
     const {article_id} = req.params
-    updateVotesById(body,article_id)
-    .then((updatedArticle) => {
+    Promise.all([updateVotesById(body,article_id), checkArticleExists(article_id)])
+    .then(([updatedArticle]) => {
         res.status(200).send({ updatedArticle });
     })
     .catch(next);
@@ -54,7 +54,7 @@ exports.patchVotesById = (req, res, next) => {
 
 exports.removeCommentById = (req, res, next) => {
     const {comment_id} = req.params
-    Promise.all([deleteCommentById(comment_id), checkCommentExists(comment_id)])
+    deleteCommentById(comment_id)
     .then((rows) => {
         res.status(204).send(rows);
     })
@@ -63,8 +63,8 @@ exports.removeCommentById = (req, res, next) => {
 
 exports.getAllUsers = (req, res, next) => {
     const table_name = 'users'
-    Promise.all([selectAllUsers(), checkIfTableExists(table_name)])
-    .then(([users]) => {
+    selectAllUsers()
+    .then((users) => {
         res.status(200).send({ users });
     })
     .catch(next);

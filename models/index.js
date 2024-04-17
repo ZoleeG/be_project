@@ -10,17 +10,8 @@ exports.selectTopics = () => {
 };
 
 exports.selectArticleById = (article_id) => {
-  const regex = /\D/;
-  const isNonDigit = regex.test(article_id);
-  if (article_id <= 0 || isNonDigit) {
-    return Promise.reject({ status: 400, msg: "Bad request" });
-  }
-
   const queryStr = `SELECT * FROM articles WHERE article_id=$1;`;
   return db.query(queryStr, [article_id]).then(({ rows }) => {
-    if (rows.length === 0) {
-      return Promise.reject({ status: 404, msg: "Article not found" });
-    }
     return rows[0];
   });
 };
@@ -88,10 +79,23 @@ exports.updateVotesById = (instructions, article_id) => {
 
   exports.deleteCommentById = (comment_id) => {
     const queryStr = 
-      `DELETE FROM comments WHERE comment_id=$1;`
-    return db.query(queryStr,[comment_id]).then(({rows}) => {
+      `DELETE FROM comments WHERE comment_id=$1 RETURNING *;`
+    return db.query(queryStr,[comment_id])
+    .then(({rows}) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Not found" });
+      }
+      const [obj] = rows
+      const comment_id2= obj.comment_id
+      const queryStr2 = `SELECT * FROM comments WHERE comment_id=$1;`
+    return db.query(queryStr2, [comment_id2])
+    })
+    .then(({rows})=>{
+      if (rows.length !== 0) {
+        return Promise.reject({ status: 418, msg: "Deleted but still exists. How is this possible?" });
+      }
       return rows
-    });
+    })
   };
 
   exports.checkCommentExists = (comment_id) => {
@@ -105,17 +109,7 @@ exports.updateVotesById = (instructions, article_id) => {
 
   exports.selectAllUsers = () => {
     const queryStr = `SELECT username, name, avatar_url FROM users;`;
-  
     return db.query(queryStr).then(({ rows }) => {
       return rows;
-    });
-  };
-  
-  exports.checkIfTableExists = (table_name) => {
-    const queryStr = format(`SELECT * FROM %s;`, table_name);
-    return db.query(queryStr).then(({ rows }) => {
-      if (rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "not found" });
-      }
     });
   };
