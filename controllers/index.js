@@ -1,4 +1,4 @@
-const {selectTopics, selectArticleById, selectAllArticles, selectCommentsById, checkArticleExists, checkArticlesExists, addCommentById, updateVotesById} = require('../models')
+const {selectTopics, selectArticleById, selectAllArticles, selectCommentsById, checkArticleExists, checkArticlesExists, addCommentById, updateVotesById, deleteCommentById, checkCommentExists} = require('../models')
 
 exports.getTopics = (req, res, next) => {
   selectTopics().then((topics) => {
@@ -52,3 +52,11 @@ exports.patchVotesById = (req, res, next) => {
     .catch(next);
 }
 
+exports.removeCommentById = (req, res, next) => {
+    const {comment_id} = req.params
+    Promise.all([deleteCommentById(comment_id), checkCommentExists(comment_id)])
+    .then((rows) => {
+        res.status(204).send(rows);
+    })
+    .catch(next);
+}

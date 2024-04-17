@@ -5,6 +5,7 @@ const seed = require("../db/seeds/seed");
 const request = require("supertest");
 const { convertTimestampToDate } = require("../db/seeds/utils");
 const endpoints = require("../endpoints.json");
+const {checkCommentExists} = require('../models')
 
 beforeEach(() => seed(data));
 afterAll(() => db.end());
@@ -342,6 +343,35 @@ describe('PATCH /api/articles/:article_id', () => {
       .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe("Bad request")
+      });
+  });
+});
+describe('DELETE /api/comments/:comment_id', () => {
+  it('DELETE 204: it should delete the given comment by comment_id and respond with status 204 and no content', () => {
+    return request(app)
+      .delete("/api/comments/11")
+      .expect(204)
+      .then(({ body }) => {
+        const expected = {}
+        expect(body).toEqual(expected)
+      });
+  });
+  it('DELETE 404: if path does not exist', () => {
+    return request(app)
+      .delete("/api/comments/19")
+      .expect(404)
+      .then(({ body }) => {
+        const expected = 'not found'
+        expect(body.msg).toEqual(expected);
+      });
+  });
+  it('DELETE 400: invalid path', () => {
+    return request(app)
+      .delete("/api/comments/hu")
+      .expect(400)
+      .then(({ body }) => {
+        const expected = 'Bad request'
+        expect(body.msg).toEqual(expected);
       });
   });
 });

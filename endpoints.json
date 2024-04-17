@@ -105,5 +105,11 @@
         }
       ]
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "it should delete the given comment by comment_id and respond with status 204 and no content",
+    "queries": [],
+    "parameter": ["comment_id"],
+    "exampleResponse": {}
   }
 }
