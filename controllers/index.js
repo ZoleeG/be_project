@@ -80,7 +80,6 @@ exports.removeCommentById = (req, res, next) => {
 };
 
 exports.getAllUsers = (req, res, next) => {
-  const table_name = "users";
   selectAllUsers()
     .then((users) => {
       res.status(200).send({ users });

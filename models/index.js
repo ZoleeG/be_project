@@ -1,6 +1,6 @@
 const db = require("../db/connection");
 const format = require("pg-format");
-const { articleData } = require("../db/data/test-data");
+const {topicData, articleData} = require("../db/data/test-data");
 
 exports.selectTopics = () => {
   const queryStr = `SELECT * FROM topics;`;
@@ -17,19 +17,26 @@ exports.selectArticleById = (article_id) => {
 };
 
 exports.selectAllArticles = (query) => {
-  if (Object.keys(query)[0] && ![ 'topic' ].includes(Object.keys(query)[0])) {
-    return Promise.reject({ status: 400, msg: "Bad request" });
-  }
-  const { topic } = query
-  let queryStr = 'SELECT articles.author, title, articles.article_id, topic, articles.created_at, article_img_url, COUNT(comments.article_id) AS comment_count, SUM(comments.votes) AS votes FROM articles JOIN comments ON articles.article_id=comments.article_id ';
+  let count=0
+  const queryKey = Object.keys(query)[0]
+  const queryValue = query[queryKey]
+  topicData.forEach((topicObj)=>{
+    const {slug} = topicObj
+    if(slug!==queryValue)count++
+  })
+  if(queryKey && count===topicData.length){
+    return Promise.reject({ status: 400, msg: "Bad request" })}
+  
+  let queryStr =
+    "SELECT articles.author, title, articles.article_id, topic, articles.created_at, article_img_url, COUNT(comments.article_id) AS comment_count, SUM(comments.votes) AS votes FROM articles JOIN comments ON articles.article_id=comments.article_id ";
 
-  if(topic){
-    queryStr+=format('WHERE topic=%L ', topic)
+  if (queryValue) {
+    queryStr += format("WHERE %s=%L ", queryKey, queryValue);
   }
 
-  queryStr += 'GROUP BY articles.article_id ORDER BY articles.created_at;'
+  queryStr += "GROUP BY articles.article_id ORDER BY articles.created_at;";
   return db.query(queryStr).then(({ rows }) => {
-    if(rows.length===0){
+    if (rows.length === 0) {
       return Promise.reject({ status: 404, msg: "Not found" });
     }
     return rows;
@@ -37,7 +44,6 @@ exports.selectAllArticles = (query) => {
 };
 
 exports.selectCommentsById = (article_id) => {
-  
   const queryStr = `SELECT * FROM comments WHERE comments.article_id = $1 ORDER BY comments.created_at DESC;`;
 
   return db.query(queryStr, [article_id]).then(({ rows }) => {
@@ -54,18 +60,9 @@ exports.checkArticleExists = (article_id) => {
   });
 };
 
-exports.checkArticlesExists = () => {
-  const queryStr = `SELECT * FROM articles;`
-  return db.query(queryStr).then(({ rows }) => {
-    if (rows.length === 0) {
-      return Promise.reject({ status: 404, msg: "not found" });
-    }
-  });
-};
-
 exports.addCommentById = (newComment, article_id) => {
   const { username, body } = newComment;
-  
+
   const queryStr = format(
     `INSERT INTO comments (body, author, article_id) VALUES %L RETURNING * ;`,
     [[body, username, article_id]]
@@ -76,52 +73,58 @@ exports.addCommentById = (newComment, article_id) => {
 };
 
 exports.updateVotesById = (instructions, article_id) => {
-    const { inc_votes } = instructions;
-    if (![-100, 1].includes(inc_votes)) {
-        return Promise.reject({ status: 400, msg: "Bad request" });
-      }
-    const increment=`votes+${inc_votes}`
+  const { inc_votes } = instructions;
+  if (![-100, 1].includes(inc_votes)) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+  const increment = `votes+${inc_votes}`;
 
-    const queryStr = format(
-      `UPDATE articles SET votes=%s WHERE article_id=%s RETURNING * ;`,increment, article_id)
-    return db.query(queryStr).then(({ rows }) => {
-      return rows;
-    });
-  };
+  const queryStr = format(
+    `UPDATE articles SET votes=%s WHERE article_id=%s RETURNING * ;`,
+    increment,
+    article_id
+  );
+  return db.query(queryStr).then(({ rows }) => {
+    return rows;
+  });
+};
 
-  exports.deleteCommentById = (comment_id) => {
-    const queryStr = 
-      `DELETE FROM comments WHERE comment_id=$1 RETURNING *;`
-    return db.query(queryStr,[comment_id])
-    .then(({rows}) => {
+exports.deleteCommentById = (comment_id) => {
+  const queryStr = `DELETE FROM comments WHERE comment_id=$1 RETURNING *;`;
+  return db
+    .query(queryStr, [comment_id])
+    .then(({ rows }) => {
       if (rows.length === 0) {
         return Promise.reject({ status: 404, msg: "Not found" });
       }
-      const [obj] = rows
-      const comment_id2= obj.comment_id
-      const queryStr2 = `SELECT * FROM comments WHERE comment_id=$1;`
-    return db.query(queryStr2, [comment_id2])
+      const [obj] = rows;
+      const comment_id2 = obj.comment_id;
+      const queryStr2 = `SELECT * FROM comments WHERE comment_id=$1;`;
+      return db.query(queryStr2, [comment_id2]);
     })
-    .then(({rows})=>{
+    .then(({ rows }) => {
       if (rows.length !== 0) {
-        return Promise.reject({ status: 418, msg: "Deleted but still exists. How is this possible?" });
+        return Promise.reject({
+          status: 418,
+          msg: "Deleted but still exists. How is this possible?",
+        });
       }
-      return rows
-    })
-  };
-
-  exports.checkCommentExists = (comment_id) => {
-    const queryStr = `SELECT * FROM comments WHERE comment_id=$1;`;
-    return db.query(queryStr,[comment_id]).then(({ rows }) => {
-      if (rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "not found" });
-      }
-    });
-  };
-
-  exports.selectAllUsers = () => {
-    const queryStr = `SELECT username, name, avatar_url FROM users;`;
-    return db.query(queryStr).then(({ rows }) => {
       return rows;
     });
-  };
+};
+
+exports.checkCommentExists = (comment_id) => {
+  const queryStr = `SELECT * FROM comments WHERE comment_id=$1;`;
+  return db.query(queryStr, [comment_id]).then(({ rows }) => {
+    if (rows.length === 0) {
+      return Promise.reject({ status: 404, msg: "not found" });
+    }
+  });
+};
+
+exports.selectAllUsers = () => {
+  const queryStr = `SELECT username, name, avatar_url FROM users;`;
+  return db.query(queryStr).then(({ rows }) => {
+    return rows;
+  });
+};
