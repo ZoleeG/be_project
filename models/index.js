@@ -17,22 +17,30 @@ exports.selectArticleById = (article_id) => {
 };
 
 exports.selectAllArticles = (query) => {
-const {topic} = query
-  let count=0
-
-  const {topicData} = data
+if(!query.topic && Object.keys(query).length!==0){
+  return Promise.reject({ status: 400, msg: "Bad request" })
+}
+const {topicData} = data
+const validQueries=[]
+if(query.topic){  
   topicData.forEach((dataObj)=>{
     const {slug} = dataObj
-    if(slug!==topic)count++
+    if(slug===query.topic){
+      validQueries.push(query.topic)
+    }
   })
-  if(topic && count===topicData.length || Object.keys(query)[0] && Object.keys(query)[0]!=='topic'){
-    return Promise.reject({ status: 400, msg: "Bad request" })}
+}
+if(query.topic && validQueries.length===0){
+  return Promise.reject({ status: 400, msg: "Bad request" })
+}
+  
   
   let queryStr =
     `SELECT articles.author, title, articles.article_id, topic, articles.created_at, article_img_url, COUNT(comments.article_id) AS comment_count, SUM(comments.votes) AS votes FROM articles JOIN comments ON articles.article_id=comments.article_id `;
 
-  if (topic) {
-    queryStr += format('WHERE topic=%L ', topic)
+  if (validQueries.length===1) {
+      const [topic]= validQueries
+      queryStr += format('WHERE topic=%L ', topic)
   }
   queryStr += `GROUP BY articles.article_id ORDER BY articles.created_at;`;
   return db.query(queryStr).then(({ rows }) => {
