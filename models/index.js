@@ -17,25 +17,24 @@ exports.selectArticleById = (article_id) => {
 };
 
 exports.selectAllArticles = (query) => {
+const {topic} = query
   let count=0
-  const queryKey = Object.keys(query)[0]
-  const queryValue = query[queryKey]
+
   const {topicData} = data
   topicData.forEach((dataObj)=>{
     const {slug} = dataObj
-    if(slug!==queryValue)count++
+    if(slug!==topic)count++
   })
-  if(queryKey && count===topicData.length){
+  if(topic && count===topicData.length || Object.keys(query)[0] && Object.keys(query)[0]!=='topic'){
     return Promise.reject({ status: 400, msg: "Bad request" })}
   
   let queryStr =
-    "SELECT articles.author, title, articles.article_id, topic, articles.created_at, article_img_url, COUNT(comments.article_id) AS comment_count, SUM(comments.votes) AS votes FROM articles JOIN comments ON articles.article_id=comments.article_id ";
+    `SELECT articles.author, title, articles.article_id, topic, articles.created_at, article_img_url, COUNT(comments.article_id) AS comment_count, SUM(comments.votes) AS votes FROM articles JOIN comments ON articles.article_id=comments.article_id `;
 
-  if (queryValue) {
-    queryStr += format("WHERE %s=%L ", queryKey, queryValue);
+  if (topic) {
+    queryStr += format('WHERE topic=%L ', topic)
   }
-
-  queryStr += "GROUP BY articles.article_id ORDER BY articles.created_at;";
+  queryStr += `GROUP BY articles.article_id ORDER BY articles.created_at;`;
   return db.query(queryStr).then(({ rows }) => {
     if (rows.length === 0) {
       return Promise.reject({ status: 404, msg: "Not found" });
