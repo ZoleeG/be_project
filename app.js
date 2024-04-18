@@ -58,7 +58,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-    resp.status(500).send({ msg: "internal server error" });
+    res.status(500).send({ msg: "internal server error" });
   });
 
 module.exports = app;
