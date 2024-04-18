@@ -1,6 +1,6 @@
 const db = require("../db/connection");
 const format = require("pg-format");
-const {topicData, articleData} = require("../db/data/test-data");
+const data = require("../db/data/test-data");
 
 exports.selectTopics = () => {
   const queryStr = `SELECT * FROM topics;`;
@@ -20,8 +20,9 @@ exports.selectAllArticles = (query) => {
   let count=0
   const queryKey = Object.keys(query)[0]
   const queryValue = query[queryKey]
-  topicData.forEach((topicObj)=>{
-    const {slug} = topicObj
+  const {topicData} = data
+  topicData.forEach((dataObj)=>{
+    const {slug} = dataObj
     if(slug!==queryValue)count++
   })
   if(queryKey && count===topicData.length){
