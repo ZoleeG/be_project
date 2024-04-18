@@ -539,13 +539,14 @@ describe("GET /api/articles?topic=", () => {
         });
       });
   });
-  it('GET 404: if topic has no associated articles', () => {
+  it('GET 200: returns an empty array if topic has no associated articles', () => {
     return request(app)
       .get("/api/articles?topic=paper")
-      .expect(404)
-      .then(({body}) => {
-        const expected = "Not found";
-        expect(body.msg).toEqual(expected)
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { articles } = body;
+        expect(articles).toEqual([]);
       });
   });
   it("GET 400: if topic does not exist", () => {

@@ -36,9 +36,6 @@ const {topic} = query
   }
   queryStr += `GROUP BY articles.article_id ORDER BY articles.created_at;`;
   return db.query(queryStr).then(({ rows }) => {
-    if (rows.length === 0) {
-      return Promise.reject({ status: 404, msg: "Not found" });
-    }
     return rows;
   });
 };
