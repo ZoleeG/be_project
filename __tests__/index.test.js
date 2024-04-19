@@ -74,7 +74,7 @@ describe("GET /api/articles/:article_id", () => {
       .expect(200)
       .then((response) => {
         const expected = {
-          comment_count: "11"
+          comment_count: "11",
         };
         const { body } = response;
         const actual = body.article;
@@ -539,7 +539,7 @@ describe("GET /api/articles?topic=", () => {
         });
       });
   });
-  it('GET 200: returns an empty array if topic has no associated articles', () => {
+  it("GET 200: returns an empty array if topic has no associated articles", () => {
     return request(app)
       .get("/api/articles?topic=paper")
       .expect(200)
@@ -549,22 +549,57 @@ describe("GET /api/articles?topic=", () => {
         expect(articles).toEqual([]);
       });
   });
-   it("GET 400: if topic does not exist", () => {
+  it("GET 400: if topic does not exist", () => {
     return request(app)
       .get("/api/articles?topic=55")
       .expect(400)
-      .then(({body}) => {
+      .then(({ body }) => {
         const expected = "Bad request";
-        expect(body.msg).toEqual(expected)
+        expect(body.msg).toEqual(expected);
       });
   });
-  it("GET 400: if query key is incorrect", () => {
+  it("GET 200: returns all the articles if query key is incorrect", () => {
     return request(app)
       .get("/api/articles?tok=mitch")
-      .expect(400)
-      .then(({body}) => {
-        const expected = "Bad request";
-        expect(body.msg).toEqual(expected)
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { articles } = body;
+        const length = articles.length;
+
+        expect(length).toBe(5);
+
+        articles.forEach((article) => {
+          expect(Object.keys(article).length).toBe(8);
+          expect(Object.keys(article)).toEqual([
+            "author",
+            "title",
+            "article_id",
+            "topic",
+            "created_at",
+            "article_img_url",
+            "comment_count",
+            "votes",
+          ]);
+          const {
+            author,
+            title,
+            article_id,
+            topic,
+            created_at,
+            votes,
+            article_img_url,
+            comment_count,
+          } = article;
+          expect(typeof author).toBe("string");
+          expect(typeof title).toBe("string");
+          expect(typeof article_id).toBe("number");
+          expect(typeof topic).toBe("string");
+          expect(typeof created_at).toBe("string");
+          expect(typeof votes).toBe("string");
+          expect(typeof article_img_url).toBe("string");
+          expect(typeof comment_count).toBe("string");
+        });
       });
   });
 });

@@ -36,10 +36,6 @@ exports.selectAllArticles = (query) => {
     queryStr += ` articles.author = $${queryValues.length}`;
   }
 
-  if(!query.topic && Object.keys(query)[0]){
-  return Promise.reject({ status: 400, msg: "Bad request" })
-  }
-
 const {topicData} = data
 const validQueries=[]
 if(query.topic){  
