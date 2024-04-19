@@ -35,9 +35,11 @@ exports.selectAllArticles = (query) => {
     queryValues.push(query.author);
     queryStr += ` articles.author = $${queryValues.length}`;
   }
-  /* if(!query.topic && Object.keys(query).length!==0){
+
+  if(!query.topic && Object.keys(query)[0]){
   return Promise.reject({ status: 400, msg: "Bad request" })
-}
+  }
+
 const {topicData} = data
 const validQueries=[]
 if(query.topic){  
@@ -48,9 +50,10 @@ if(query.topic){
     }
   })
 }
-if(query.topic && validQueries.length===0){
+if(query.topic && !validQueries.length){
   return Promise.reject({ status: 400, msg: "Bad request" })
-} */
+}
+
   queryStr += " GROUP BY articles.article_id ORDER BY articles.created_at;";
   return db.query(queryStr, queryValues).then(({ rows }) => {
     return rows;

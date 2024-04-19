@@ -549,7 +549,7 @@ describe("GET /api/articles?topic=", () => {
         expect(articles).toEqual([]);
       });
   });
-  /* it("GET 400: if topic does not exist", () => {
+   it("GET 400: if topic does not exist", () => {
     return request(app)
       .get("/api/articles?topic=55")
       .expect(400)
@@ -566,5 +566,5 @@ describe("GET /api/articles?topic=", () => {
         const expected = "Bad request";
         expect(body.msg).toEqual(expected)
       });
-  }); */
+  });
 });
