@@ -549,16 +549,17 @@ describe("GET /api/articles?topic=", () => {
         expect(articles).toEqual([]);
       });
   });
-  it("GET 400: if topic does not exist", () => {
+  it("GET 200: even if topic does not exist it will return an empty array", () => {
     return request(app)
       .get("/api/articles?topic=55")
-      .expect(400)
-      .then(({ body }) => {
-        const expected = "Bad request";
-        expect(body.msg).toEqual(expected);
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { articles } = body;
+        expect(articles).toEqual([]);
       });
   });
-  it("GET 200: returns all the articles if query key is incorrect", () => {
+  it("GET 200: returns all the articles even if query key is incorrect", () => {
     return request(app)
       .get("/api/articles?tok=mitch")
       .expect(200)

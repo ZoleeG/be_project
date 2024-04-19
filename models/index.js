@@ -36,20 +36,6 @@ exports.selectAllArticles = (query) => {
     queryStr += ` articles.author = $${queryValues.length}`;
   }
 
-const {topicData} = data
-const validQueries=[]
-if(query.topic){  
-  topicData.forEach((dataObj)=>{
-    const {slug} = dataObj
-    if(slug===query.topic){
-      validQueries.push(query.topic)
-    }
-  })
-}
-if(query.topic && !validQueries.length){
-  return Promise.reject({ status: 400, msg: "Bad request" })
-}
-
   queryStr += " GROUP BY articles.article_id ORDER BY articles.created_at;";
   return db.query(queryStr, queryValues).then(({ rows }) => {
     return rows;
