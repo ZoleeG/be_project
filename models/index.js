@@ -17,7 +17,25 @@ exports.selectArticleById = (article_id) => {
 };
 
 exports.selectAllArticles = (query) => {
-if(!query.topic && Object.keys(query).length!==0){
+  const queryValues = [];
+  let queryStr =
+    "SELECT articles.author, title, articles.article_id, topic, articles.created_at, article_img_url, COUNT(comments.article_id) AS comment_count, SUM(comments.votes) AS votes FROM articles JOIN comments ON articles.article_id=comments.article_id";
+
+  if (query.topic) {
+    queryValues.push(query.topic);
+    queryStr += ` WHERE topic = $1`;
+  }
+
+  if (query.author) {
+    if (queryValues.length) {
+      queryStr += " AND";
+    } else {
+      queryStr += " WHERE";
+    }
+    queryValues.push(query.author);
+    queryStr += ` articles.author = $${queryValues.length}`;
+  }
+  /* if(!query.topic && Object.keys(query).length!==0){
   return Promise.reject({ status: 400, msg: "Bad request" })
 }
 const {topicData} = data
@@ -32,18 +50,9 @@ if(query.topic){
 }
 if(query.topic && validQueries.length===0){
   return Promise.reject({ status: 400, msg: "Bad request" })
-}
-  
-  
-  let queryStr =
-    `SELECT articles.author, title, articles.article_id, topic, articles.created_at, article_img_url, COUNT(comments.article_id) AS comment_count, SUM(comments.votes) AS votes FROM articles JOIN comments ON articles.article_id=comments.article_id `;
-
-  if (validQueries.length===1) {
-      const [topic]= validQueries
-      queryStr += format('WHERE topic=%L ', topic)
-  }
-  queryStr += `GROUP BY articles.article_id ORDER BY articles.created_at;`;
-  return db.query(queryStr).then(({ rows }) => {
+} */
+  queryStr += " GROUP BY articles.article_id ORDER BY articles.created_at;";
+  return db.query(queryStr, queryValues).then(({ rows }) => {
     return rows;
   });
 };
