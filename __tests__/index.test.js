@@ -604,3 +604,36 @@ describe("GET /api/articles?topic=", () => {
       });
   });
 });
+describe('GET /api/articles [sort_by, order]', () => {
+  it('GET 200: it should now accept these queries: sort_by, which sorts the articles by any valid column (defaults to the created_at date) and order, which can be set to asc or desc for ascending or descending (defaults to descending)', () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes&order=desc")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { articles } = body;
+        const length = articles.length;
+        expect(length).toBe(5);
+
+        const expectedSortBy = "votes";
+        const expectedOrder = { descending: true, coerce: true };
+        expect(articles).toBeSortedBy(expectedSortBy, expectedOrder);
+      });
+  });
+  it('GET 200: when all 3 queries are used', () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=votes&order=asc")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { articles } = body;
+        console.log(articles);
+        const length = articles.length;
+        expect(length).toBe(4);
+
+        const expectedSortBy = "votes";
+        const expectedOrder = { ascending: true, coerce: true };
+        expect(articles).toBeSortedBy(expectedSortBy, expectedOrder);
+      });
+  });
+});

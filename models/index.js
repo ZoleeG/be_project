@@ -16,17 +16,19 @@ exports.selectArticleById = (article_id) => {
   });
 };
 
-exports.selectAllArticles = (query) => {
+exports.selectAllArticles = (order = "DESC", sort_by = "created_at", topic) => {
   const queryValues = [];
   let queryStr =
     "SELECT articles.author, title, articles.article_id, topic, articles.created_at, article_img_url, COUNT(comments.article_id) AS comment_count, SUM(comments.votes) AS votes FROM articles JOIN comments ON articles.article_id=comments.article_id";
 
-  if (query.topic) {
-    queryValues.push(query.topic);
+  if (topic) {
+    queryValues.push(topic);
     queryStr += ` WHERE topic = $1`;
   }
 
-  queryStr += " GROUP BY articles.article_id ORDER BY articles.created_at;";
+  queryStr += " GROUP BY articles.article_id";
+
+  queryStr += format(` ORDER BY %I %s ;`, sort_by, order);
   return db.query(queryStr, queryValues).then(({ rows }) => {
     return rows;
   });
