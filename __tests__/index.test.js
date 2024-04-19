@@ -627,7 +627,6 @@ describe('GET /api/articles [sort_by, order]', () => {
       .then((response) => {
         const { body } = response;
         const { articles } = body;
-        console.log(articles);
         const length = articles.length;
         expect(length).toBe(4);
 
