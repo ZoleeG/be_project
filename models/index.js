@@ -26,16 +26,6 @@ exports.selectAllArticles = (query) => {
     queryStr += ` WHERE topic = $1`;
   }
 
-  if (query.author) {
-    if (queryValues.length) {
-      queryStr += " AND";
-    } else {
-      queryStr += " WHERE";
-    }
-    queryValues.push(query.author);
-    queryStr += ` articles.author = $${queryValues.length}`;
-  }
-
   queryStr += " GROUP BY articles.article_id ORDER BY articles.created_at;";
   return db.query(queryStr, queryValues).then(({ rows }) => {
     return rows;
