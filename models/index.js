@@ -26,6 +26,8 @@ exports.selectAllArticles = (order = "DESC", sort_by = "created_at", topic) => {
     queryStr += ` WHERE topic = $1`;
   }
 
+  
+
   queryStr += " GROUP BY articles.article_id";
 
   queryStr += format(` ORDER BY %I %s ;`, sort_by, order);
