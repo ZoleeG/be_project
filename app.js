@@ -1,11 +1,17 @@
 const express = require("express");
 const app = express();
-const { getTopics, getArticleById, getAllArticles, getCommentsById, postCommentById, patchVotesById, removeCommentById, getAllUsers } = require("./controllers");
-const endpoints = require("./endpoints.json");
+/* const { getTopics, getArticleById, getAllArticles, getCommentsById, postCommentById, patchVotesById, removeCommentById, getAllUsers } = require("./controllers"); */
+
+
+
+const apiRouter = require('./routes/api-router')
+
+app.use('/api', apiRouter)
+
 
 app.use(express.json());
 
-app.get("/api/topics", getTopics);
+/* app.get("/api/topics", getTopics);
 
 app.get("/api", (req, res, next) => {
   res.status(200).send(endpoints);
@@ -23,7 +29,7 @@ app.patch("/api/articles/:article_id",patchVotesById)
 
 app.delete("/api/comments/:comment_id", removeCommentById)
 
-app.get("/api/users", getAllUsers)
+app.get("/api/users", getAllUsers) */
 
 app.all("*", (req, res, next) => {
   res.status(404).send({ msg: "Invalid path" });
