@@ -5,16 +5,17 @@ const express = require("express");
 const articlesRouter = require('express').Router()
 
 articlesRouter.use(express.json())
-//app.use(express.json());
-
-articlesRouter.get("/:article_id", getArticleById);
 
 articlesRouter.get("/", getAllArticles)
 
-articlesRouter.get("/:article_id/comments", getCommentsById)
+articlesRouter
+.route("/:article_id")
+.get(getArticleById)
+.patch(patchVotesById)
 
-articlesRouter.post("/:article_id/comments", postCommentById)
-
-articlesRouter.patch("/:article_id",patchVotesById)
+articlesRouter
+.route('/:article_id/comments')
+.get(getCommentsById)
+.post(postCommentById)
 
 module.exports = articlesRouter
