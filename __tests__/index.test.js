@@ -496,6 +496,47 @@ describe("GET /api/users", () => {
       });
   });
 });
+describe('GET /api/users/:username', () => {
+  it('GET 200: should accept a username query and return the corresponding user object which should have the following properties: username, avatar_url, name', () => {
+    return request(app)
+      .get("/api/users?username=icellusedkars")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { users } = body;
+        const length = users.length;
+        const { userData } = data;
+        const expected=userData.filter(user=>{
+          return user.username==='icellusedkars'
+        })
+        expect(length).toBe(1);
+        expect(users).toMatchObject(expected);
+      });
+  });
+  it('GET 200: should return an empty array if no such username', () => {
+    return request(app)
+      .get("/api/users?username=icelloo")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { users } = body;
+        expect(users).toMatchObject([]);
+      });
+  });
+  it('GET 200: should return all the users if queryKey is incorrect', () => {
+    return request(app)
+      .get("/api/users?nem=icel")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { users } = body;
+        const length = users.length;
+        const { userData } = data;
+        expect(length).toBe(4);
+        expect(users).toMatchObject(userData);
+      });
+  });
+});
 describe("GET /api/articles?topic=", () => {
   it("GET 200: should accept a topic query, and respond with a filtered set of articles according to it", () => {
     return request(app)

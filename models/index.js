@@ -115,9 +115,16 @@ exports.checkCommentExists = (comment_id) => {
   });
 };
 
-exports.selectAllUsers = () => {
-  const queryStr = `SELECT username, name, avatar_url FROM users;`;
-  return db.query(queryStr).then(({ rows }) => {
+exports.selectAllUsers = (username) => {
+  const queryValues = [];
+  let queryStr =
+    "SELECT * FROM users";
+
+  if (username) {
+    queryValues.push(username);
+    queryStr += ` WHERE username = $1`;
+  }
+  return db.query(queryStr,queryValues).then(({ rows }) => {
     return rows;
   });
 };

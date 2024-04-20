@@ -81,7 +81,8 @@ exports.removeCommentById = (req, res, next) => {
 };
 
 exports.getAllUsers = (req, res, next) => {
-  selectAllUsers()
+  const {username} = req.query
+  selectAllUsers(username)
     .then((users) => {
       res.status(200).send({ users });
     })
