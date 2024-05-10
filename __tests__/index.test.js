@@ -59,7 +59,7 @@ describe("GET /api/articles/:article_id", () => {
           author: "butter_bridge",
           body: "I find this existence challenging",
           created_at: "2020-07-09T20:11:00.000Z",
-          votes: '30',
+          votes: 100,
           article_img_url:
             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
         };
@@ -404,7 +404,7 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(actual).toMatchObject(expected);
       });
   });
-  it("PATCH 400: bad request error is thrown if inc_votes different from -100 or 1", () => {
+  it("PATCH 400: bad request error is thrown if inc_votes different from -1 or 1", () => {
     const inputBody = {
       inc_votes: "1",
     };
