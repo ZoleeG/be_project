@@ -113,7 +113,7 @@ exports.checkCommentExists = (comment_id) => {
   const queryStr = `SELECT * FROM comments WHERE comment_id=$1;`;
   return db.query(queryStr, [comment_id]).then(({ rows }) => {
     if (rows.length === 0) {
-      return Promise.reject({ status: 404, msg: "not found" });
+      return Promise.reject({ status: 404, msg: "Comment not found" });
     }
   });
 };
@@ -128,6 +128,23 @@ exports.selectAllUsers = (username) => {
     queryStr += ` WHERE username = $1`;
   }
   return db.query(queryStr,queryValues).then(({ rows }) => {
+    return rows;
+  });
+};
+
+exports.updateCommentVotesById = (instructions, comment_id) => {
+  const { inc_votes } = instructions;
+  if (![-1, 1].includes(inc_votes)) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+  const increment = `votes+${inc_votes}`;
+
+  const queryStr = format(
+    `UPDATE comments SET votes=%s WHERE comment_id=%s RETURNING * ;`,
+    increment,
+    comment_id
+  );
+  return db.query(queryStr).then(({ rows }) => {
     return rows;
   });
 };

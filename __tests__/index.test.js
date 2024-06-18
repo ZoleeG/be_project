@@ -4,7 +4,6 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const request = require("supertest");
 const endpoints = require("../endpoints.json");
-const { checkCommentExists } = require("../models");
 
 beforeEach(() => seed(data));
 afterAll(() => db.end());
@@ -496,7 +495,7 @@ describe("GET /api/users", () => {
       });
   });
 });
-describe('GET /api/users/:username', () => {
+describe('GET /api/users?username=', () => {
   it('GET 200: should accept a username query and return the corresponding user object which should have the following properties: username, avatar_url, name', () => {
     return request(app)
       .get("/api/users?username=icellusedkars")
@@ -677,3 +676,93 @@ describe('GET /api/articles [sort_by, order]', () => {
       });
   });
 });
+describe("PATCH /api/comments/:comment_id", () => {
+  it("PATCH 200: should update the selected comment in accordance with the input body, where { inc_votes : 1 } would increment the respective comment's vote property by 1", () => {
+    const inputBody = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(inputBody)
+      .expect(200)
+      .then(({ body }) => {
+        const { updatedComment } = body;
+        const [actual] = updatedComment;
+        const expected = {
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          votes: 17,
+          author: "butter_bridge",
+          article_id: 9,
+        }
+        expect(actual).toMatchObject(expected);
+      });
+  });
+  it("PATCH 200: should update the selected comment in accordance with the input body, where { inc_votes : -1 } would decrement the respective comment's vote property by 1", () => {
+    const inputBody = {
+      inc_votes: -1,
+    };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(inputBody)
+      .expect(200)
+      .then(({ body }) => {
+        const { updatedComment } = body;
+        const [actual] = updatedComment;
+        const expected = {
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          votes: 15,
+          author: "butter_bridge",
+          article_id: 9,
+        }
+        expect(actual).toMatchObject(expected);
+      });
+  });
+  it("PATCH 400: bad request error is thrown if inc_votes different from -1 or 1", () => {
+    const inputBody = {
+      inc_votes: "1",
+    };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(inputBody)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad request");
+      });
+  });
+  it("PATCH 400: invalid id", () => {
+    const inputBody = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/comments/hu")
+      .send(inputBody)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad request");
+      });
+  });
+  it("PATCH 404: valid id but not in the database", () => {
+    const inputBody = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/comments/9999")
+      .send(inputBody)
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Comment not found");
+      });
+  });
+  it("PATCH 400: invalid key on the input object", () => {
+    const inputBody = {
+      not_inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(inputBody)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad request");
+      });
+  });
+})

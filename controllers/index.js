@@ -11,6 +11,7 @@ const {
   checkCommentExists,
   selectAllUsers,
   checkIfTableExists,
+  updateCommentVotesById,
 } = require("../models");
 
 exports.getTopics = (req, res, next) => {
@@ -85,6 +86,19 @@ exports.getAllUsers = (req, res, next) => {
   selectAllUsers(username)
     .then((users) => {
       res.status(200).send({ users });
+    })
+    .catch(next);
+};
+
+exports.patchCommentVotesById = (req, res, next) => {
+  const { body } = req;
+  const { comment_id } = req.params;
+  Promise.all([
+    updateCommentVotesById(body, comment_id),
+    checkCommentExists(comment_id),
+  ])
+    .then(([updatedComment]) => {
+      res.status(200).send({ updatedComment });
     })
     .catch(next);
 };
