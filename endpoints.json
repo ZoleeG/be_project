@@ -165,5 +165,22 @@
         }
       ]
     }
+  },
+  "POST /api/topics": {
+    "description": "creates a new topic with the input keys: slug and description, and returns the newly added topic object",
+    "queries": [],
+    "parameter": [],
+    "exampleInputBody": {
+      "slug": "euro 2024",
+      "description": "Discussion about the UEFA EURO 2024 tournament."
+    },
+    "exampleResponse": {
+      "newTopic": [
+        {
+          "slug": "euro 2024",
+          "description": "Discussion about the UEFA EURO 2024 tournament."
+        }
+      ]
+    }
   }
 }

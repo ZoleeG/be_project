@@ -188,16 +188,17 @@ describe("GET /api/articles", () => {
         const { articles } = body;
         const actual = articles[2];
         const expected = {
-          author: 'icellusedkars',
-          title: 'Sony Vaio; or, The Laptop',
+          author: "icellusedkars",
+          title: "Sony Vaio; or, The Laptop",
           article_id: 2,
-          topic: 'mitch',
-          created_at: '2020-10-16T05:03:00.000Z',
-          article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
-          comment_count: '0',
-          votes: '0',
-          total_count: '3'
-        }
+          topic: "mitch",
+          created_at: "2020-10-16T05:03:00.000Z",
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          comment_count: "0",
+          votes: "0",
+          total_count: "3",
+        };
         expect(actual).toEqual(expected);
       });
   });
@@ -777,7 +778,8 @@ describe("POST /api/articles", () => {
       title: "How to write a cover letter",
       body: `Writing a cover letter involves crafting a concise, engaging document that complements your resume and highlights your suitability for the job you're applying for. Here's a step-by-step guide`,
       topic: "mitch",
-      article_img_url:"https://images.pexels.com/photos/48195/document-agreement-documents-sign-48195.jpeg?w=700&h=700",
+      article_img_url:
+        "https://images.pexels.com/photos/48195/document-agreement-documents-sign-48195.jpeg?w=700&h=700",
     };
     return request(app)
       .post("/api/articles")
@@ -791,7 +793,8 @@ describe("POST /api/articles", () => {
           title: "How to write a cover letter",
           body: `Writing a cover letter involves crafting a concise, engaging document that complements your resume and highlights your suitability for the job you're applying for. Here's a step-by-step guide`,
           topic: "mitch",
-          article_img_url:"https://images.pexels.com/photos/48195/document-agreement-documents-sign-48195.jpeg?w=700&h=700",
+          article_img_url:
+            "https://images.pexels.com/photos/48195/document-agreement-documents-sign-48195.jpeg?w=700&h=700",
         };
         expect(actual).toMatchObject(expected);
         const bodyKey = actual.body;
@@ -821,7 +824,7 @@ describe("POST /api/articles", () => {
       author: "rogersop",
       title: "How to write a cover letter",
       body: `Writing a cover letter involves crafting a concise, engaging document that complements your resume and highlights your suitability for the job you're applying for. Here's a step-by-step guide`,
-      topic: "mitch"
+      topic: "mitch",
     };
     return request(app)
       .post("/api/articles")
@@ -835,7 +838,7 @@ describe("POST /api/articles", () => {
           title: "How to write a cover letter",
           body: `Writing a cover letter involves crafting a concise, engaging document that complements your resume and highlights your suitability for the job you're applying for. Here's a step-by-step guide`,
           topic: "mitch",
-          article_img_url:default_article_img_url,
+          article_img_url: default_article_img_url,
         };
         expect(actual).toMatchObject(expected);
         const bodyKey = actual.body;
@@ -866,7 +869,8 @@ describe("POST /api/articles", () => {
       title: "How to write a cover letter",
       body: `Writing a cover letter involves crafting a concise, engaging document that complements your resume and highlights your suitability for the job you're applying for. Here's a step-by-step guide`,
       topic: "mitch",
-      article_img_url:"https://images.pexels.com/photos/48195/document-agreement-documents-sign-48195.jpeg?w=700&h=700",
+      article_img_url:
+        "https://images.pexels.com/photos/48195/document-agreement-documents-sign-48195.jpeg?w=700&h=700",
     };
     return request(app)
       .post("/api/articles")
@@ -882,7 +886,8 @@ describe("POST /api/articles", () => {
       title: "How to write a cover letter",
       body: `Writing a cover letter involves crafting a concise, engaging document that complements your resume and highlights your suitability for the job you're applying for. Here's a step-by-step guide`,
       topic: "itdoesntexist",
-      article_img_url:"https://images.pexels.com/photos/48195/document-agreement-documents-sign-48195.jpeg?w=700&h=700",
+      article_img_url:
+        "https://images.pexels.com/photos/48195/document-agreement-documents-sign-48195.jpeg?w=700&h=700",
     };
     return request(app)
       .post("/api/articles")
@@ -897,8 +902,9 @@ describe("POST /api/articles", () => {
       author: "rogersop",
       title: "How to write a cover letter",
       body: `Writing a cover letter involves crafting a concise, engaging document that complements your resume and highlights your suitability for the job you're applying for. Here's a step-by-step guide`,
-      article_img_url:"https://images.pexels.com/photos/48195/document-agreement-documents-sign-48195.jpeg?w=700&h=700",
-    }
+      article_img_url:
+        "https://images.pexels.com/photos/48195/document-agreement-documents-sign-48195.jpeg?w=700&h=700",
+    };
     return request(app)
       .post("/api/articles")
       .send(inputBody)
@@ -938,19 +944,20 @@ describe("GET /api/articles [limit, p]", () => {
       .then((response) => {
         const { body } = response;
         const { articles } = body;
-        const expected={
-          author: 'icellusedkars',
-          title: 'Z',
+        const expected = {
+          author: "icellusedkars",
+          title: "Z",
           article_id: 7,
-          topic: 'mitch',
-          created_at: '2020-01-07T14:08:00.000Z',
-          article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
-          comment_count: '0',
-          votes: '0'
-        }
+          topic: "mitch",
+          created_at: "2020-01-07T14:08:00.000Z",
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          comment_count: "0",
+          votes: "0",
+        };
         const length = articles.length;
         expect(length).toBe(1);
-        expect(articles[0]).toMatchObject(expected)
+        expect(articles[0]).toMatchObject(expected);
       });
   });
   it("GET 200: the response should also include the total_count property, displaying the total number of articles (this should display the total number of articles with any filters applied, discounting the limit) ", () => {
@@ -960,20 +967,21 @@ describe("GET /api/articles [limit, p]", () => {
       .then((response) => {
         const { body } = response;
         const { articles } = body;
-        const expected={
-          author: 'butter_bridge',
+        const expected = {
+          author: "butter_bridge",
           title: "They're not exactly dogs, are they?",
           article_id: 9,
-          topic: 'mitch',
-          created_at: '2020-06-06T09:10:00.000Z',
-          article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
-          comment_count: '2',
-          votes: '36',
-          total_count: '5'
-        }
+          topic: "mitch",
+          created_at: "2020-06-06T09:10:00.000Z",
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          comment_count: "2",
+          votes: "36",
+          total_count: "5",
+        };
         const length = articles.length;
         expect(length).toBe(2);
-        expect(articles[1]).toEqual(expected)
+        expect(articles[1]).toEqual(expected);
       });
   });
   it("GET 200: displays the correct total_count if a filter is applied, discounting the limit", () => {
@@ -983,20 +991,21 @@ describe("GET /api/articles [limit, p]", () => {
       .then((response) => {
         const { body } = response;
         const { articles } = body;
-        const expected={
-          author: 'rogersop',
-          title: 'Seven inspirational thought leaders from Manchester UK',
+        const expected = {
+          author: "rogersop",
+          title: "Seven inspirational thought leaders from Manchester UK",
           article_id: 10,
-          topic: 'mitch',
-          created_at: '2020-05-14T04:15:00.000Z',
-          article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
-          comment_count: '0',
-          votes: '0',
-          total_count: '4'
-        }
+          topic: "mitch",
+          created_at: "2020-05-14T04:15:00.000Z",
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          comment_count: "0",
+          votes: "0",
+          total_count: "4",
+        };
         const length = articles.length;
         expect(length).toBe(2);
-        expect(articles[1]).toEqual(expected)
+        expect(articles[1]).toEqual(expected);
       });
   });
   it("GET 200: returns an empty array if limit has no associated articles", () => {
@@ -1020,7 +1029,7 @@ describe("GET /api/articles/:article_id/comments [limit, p]", () => {
         const { comments } = body;
         const length = comments.length;
 
-        expect(length).toBe(11)
+        expect(length).toBe(11);
 
         comments.forEach((comment) => {
           expect(Object.keys(comment).length).toBe(6);
@@ -1043,4 +1052,40 @@ describe("GET /api/articles/:article_id/comments [limit, p]", () => {
         });
       });
   });
-})
+});
+describe("POST /api/topics", () => {
+  it("POST 201: it should add a new topic with the input keys: slug and description, and return the newly added topic object", () => {
+    const inputBody = {
+      slug: "euro 2024",
+      description: "Discussion about the UEFA EURO 2024 tournament.",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(inputBody)
+      .expect(201)
+      .then(({ body }) => {
+        const { newTopic } = body;
+        const actual = newTopic;
+        const expected = {
+          slug: "euro 2024",
+          description: "Discussion about the UEFA EURO 2024 tournament.",
+        };
+        expect(actual).toMatchObject(expected);
+        const { slug, description } = actual;
+        expect(typeof slug).toBe("string");
+        expect(typeof description).toBe("string");
+      });
+  });
+  it("POST 400: missing field(s) in the input body, eg. if slug is missing", () => {
+    const inputBody = {
+      description: "Discussion about the UEFA EURO 2024 tournament.",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(inputBody)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad request");
+      });
+  });
+});

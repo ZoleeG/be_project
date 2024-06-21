@@ -173,3 +173,19 @@ exports.addNewArticle = ({ author, title, body, topic, article_img_url=this.defa
       return rows[0];
     });
 };
+
+exports.addNewTopic = ({ slug, description }) => {
+
+  const queryStr = format(
+    `INSERT INTO topics (slug, description) VALUES %L RETURNING *;`,
+    [[ slug, description ]]
+  );
+  return db
+    .query(queryStr)
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Topic not found" });
+      }
+      return rows[0];
+    });
+};

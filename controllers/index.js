@@ -11,6 +11,7 @@ const {
   selectAllUsers,
   updateCommentVotesById,
   addNewArticle,
+  addNewTopic,
 } = require("../models");
 
 exports.getTopics = (req, res, next) => {
@@ -108,6 +109,15 @@ exports.postNewArticle = (req, res, next) => {
   addNewArticle(body)
     .then((newArticle) => {
       res.status(201).send({ newArticle });
+    })
+    .catch(next);
+};
+
+exports.postNewTopic = (req, res, next) => {
+  const { body } = req;
+  addNewTopic(body)
+    .then((newTopic) => {
+      res.status(201).send({ newTopic });
     })
     .catch(next);
 };
