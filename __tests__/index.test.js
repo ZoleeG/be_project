@@ -1010,3 +1010,37 @@ describe("GET /api/articles [limit, p]", () => {
       });
   });
 });
+describe("GET /api/articles/:article_id/comments [limit, p]", () => {
+  it("GET 200: -PAGINATION- it should now accept these queries: limit, which limits the number of responses (defaults to 10), and p, stands for page and specifies the page at which to start (calculated using limit)", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=20")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { comments } = body;
+        const length = comments.length;
+
+        expect(length).toBe(11)
+
+        comments.forEach((comment) => {
+          expect(Object.keys(comment).length).toBe(6);
+          expect(Object.keys(comment)).toEqual([
+            "comment_id",
+            "body",
+            "article_id",
+            "author",
+            "votes",
+            "created_at",
+          ]);
+          const { comment_id, votes, created_at, author, body, article_id } =
+            comment;
+          expect(typeof comment_id).toBe("number");
+          expect(typeof votes).toBe("number");
+          expect(typeof created_at).toBe("string");
+          expect(typeof author).toBe("string");
+          expect(typeof body).toBe("string");
+          expect(typeof article_id).toBe("number");
+        });
+      });
+  });
+})

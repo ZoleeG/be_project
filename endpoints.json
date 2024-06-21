@@ -46,7 +46,7 @@
   },
   "GET /api/articles/:article_id/comments": {
     "description": "serves an array of comments for the given article_id sorted by their created_at attribute in descending order",
-    "queries": [],
+    "queries": ["limit", "p"],
     "exampleResponse": {
       "comments": [
         {

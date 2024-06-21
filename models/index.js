@@ -42,10 +42,11 @@ exports.selectAllArticles = (order = "DESC", sort_by = "created_at", topic, limi
   });
 };
 
-exports.selectCommentsById = (article_id) => {
-  const queryStr = `SELECT * FROM comments WHERE comments.article_id = $1 ORDER BY comments.created_at DESC;`;
+exports.selectCommentsById = (article_id, limit=10, p=1) => {
+  const skipThisManyArticles=(p-1)*limit
+  const queryStr = `SELECT * FROM comments WHERE comments.article_id = $1 ORDER BY comments.created_at DESC LIMIT $2 OFFSET $3;`;
 
-  return db.query(queryStr, [article_id]).then(({ rows }) => {
+  return db.query(queryStr, [article_id, limit, skipThisManyArticles]).then(({ rows }) => {
     return rows;
   });
 };
