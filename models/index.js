@@ -2,6 +2,8 @@ const db = require("../db/connection");
 const format = require("pg-format");
 const data = require("../db/data/test-data");
 
+exports.default_article_img_url="https://images.pexels.com/photos/159868/lost-cat-tree-sign-fun-159868.jpeg?w=700&h=700"
+
 exports.selectTopics = () => {
   const queryStr = `SELECT * FROM topics;`;
   return db.query(queryStr).then(({ rows }) => {
@@ -10,7 +12,7 @@ exports.selectTopics = () => {
 };
 
 exports.selectArticleById = (article_id) => {
-  const queryStr = `SELECT articles.article_id, title , topic, articles.author, articles.body, articles.created_at, articles.votes, article_img_url, COUNT(articles.article_id) AS comment_count FROM articles JOIN comments ON comments.article_id=articles.article_id WHERE comments.article_id=$1 GROUP BY articles.article_id;`;
+  const queryStr = `SELECT articles.article_id, title, topic, articles.author, articles.body, articles.created_at, articles.votes, article_img_url, COUNT(comments.article_id) AS comment_count FROM articles JOIN comments ON comments.article_id=articles.article_id WHERE comments.article_id=$1 GROUP BY articles.article_id;`;
   return db.query(queryStr, [article_id]).then(({ rows }) => {
     if (rows.length === 0) {
       return Promise.reject({ status: 404, msg: "Article not found" });
@@ -19,22 +21,23 @@ exports.selectArticleById = (article_id) => {
   });
 };
 
-exports.selectAllArticles = (order = "DESC", sort_by = "created_at", topic) => {
+exports.selectAllArticles = (order = "DESC", sort_by = "created_at", topic, limit=10, p=1) => {
+  const skipThisManyArticles=(p-1)*limit
+  const thisManyArticlesToDiscount=p*limit
   const queryValues = [];
-  let queryStr =
-    "SELECT articles.author, title, articles.article_id, topic, articles.created_at, article_img_url, COUNT(comments.article_id) AS comment_count, SUM(comments.votes) AS votes FROM articles JOIN comments ON articles.article_id=comments.article_id";
+  let queryStr =format(
+    `SELECT articles.author, title, articles.article_id, topic, articles.created_at, article_img_url, COUNT(comments.article_id) AS comment_count, COALESCE(SUM(comments.votes),0) AS votes, (COUNT(*) OVER() - %s) AS total_count FROM articles LEFT JOIN comments ON articles.article_id=comments.article_id`, thisManyArticlesToDiscount);
 
   if (topic) {
     queryValues.push(topic);
-    queryStr += ` WHERE topic = $1`;
+    queryStr += ` WHERE topic = $1`
   }
-
-  
 
   queryStr += " GROUP BY articles.article_id";
 
-  queryStr += format(` ORDER BY %I %s ;`, sort_by, order);
-  return db.query(queryStr, queryValues).then(({ rows }) => {
+  queryStr += format(` ORDER BY %I %s %s %s;`, sort_by, order, `LIMIT ${limit}`, `OFFSET ${skipThisManyArticles}`);
+
+  return db.query(queryStr, queryValues).then(({rows}) => {
     return rows;
   });
 };
@@ -120,14 +123,13 @@ exports.checkCommentExists = (comment_id) => {
 
 exports.selectAllUsers = (username) => {
   const queryValues = [];
-  let queryStr =
-    "SELECT * FROM users";
+  let queryStr = "SELECT * FROM users";
 
   if (username) {
     queryValues.push(username);
     queryStr += ` WHERE username = $1`;
   }
-  return db.query(queryStr,queryValues).then(({ rows }) => {
+  return db.query(queryStr, queryValues).then(({ rows }) => {
     return rows;
   });
 };
@@ -147,4 +149,26 @@ exports.updateCommentVotesById = (instructions, comment_id) => {
   return db.query(queryStr).then(({ rows }) => {
     return rows;
   });
+};
+
+exports.addNewArticle = ({ author, title, body, topic, article_img_url=this.default_article_img_url}) => {
+
+  const queryStr = format(
+    `INSERT INTO articles (author, title, body, topic, article_img_url) VALUES %L RETURNING *, article_id, created_at;`,
+    [[author, title, body, topic, article_img_url]]
+  );
+  return db
+    .query(queryStr)
+    .then(({ rows }) => {
+      const [actual] = rows;
+      const { article_id } = actual;
+      const queryStr = `SELECT articles.article_id, title, topic, articles.author, articles.body, articles.created_at, articles.votes, article_img_url, COUNT(comments.article_id) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id=articles.article_id WHERE articles.article_id=$1 GROUP BY articles.article_id;`;
+      return db.query(queryStr, [article_id])
+    })
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Article not found" });
+      }
+      return rows[0];
+    });
 };

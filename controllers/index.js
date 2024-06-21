@@ -4,14 +4,13 @@ const {
   selectAllArticles,
   selectCommentsById,
   checkArticleExists,
-  checkArticlesExists,
   addCommentById,
   updateVotesById,
   deleteCommentById,
   checkCommentExists,
   selectAllUsers,
-  checkIfTableExists,
   updateCommentVotesById,
+  addNewArticle,
 } = require("../models");
 
 exports.getTopics = (req, res, next) => {
@@ -32,10 +31,10 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getAllArticles = (req, res, next) => {
-  const {order, sort_by, topic} = req.query
-  selectAllArticles(order, sort_by, topic)
+  const {order, sort_by, topic, limit, p} = req.query
+  selectAllArticles(order, sort_by, topic, limit, p)
     .then((articles) => {
-      res.status(200).send({ articles });
+      res.status(200).send({articles});
     })
     .catch(next);
 };
@@ -99,6 +98,15 @@ exports.patchCommentVotesById = (req, res, next) => {
   ])
     .then(([updatedComment]) => {
       res.status(200).send({ updatedComment });
+    })
+    .catch(next);
+};
+
+exports.postNewArticle = (req, res, next) => {
+  const { body } = req;
+  addNewArticle(body)
+    .then((newArticle) => {
+      res.status(201).send({ newArticle });
     })
     .catch(next);
 };

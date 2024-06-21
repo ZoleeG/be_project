@@ -4,6 +4,7 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const request = require("supertest");
 const endpoints = require("../endpoints.json");
+const { default_article_img_url } = require("../models");
 
 beforeEach(() => seed(data));
 afterAll(() => db.end());
@@ -127,10 +128,10 @@ describe("GET /api/articles", () => {
         const { articles } = body;
         const length = articles.length;
 
-        expect(length).toBe(5);
+        expect(length).toBe(10);
 
         articles.forEach((article) => {
-          expect(Object.keys(article).length).toBe(8);
+          expect(Object.keys(article).length).toBe(9);
           expect(Object.keys(article)).toEqual([
             "author",
             "title",
@@ -140,6 +141,7 @@ describe("GET /api/articles", () => {
             "article_img_url",
             "comment_count",
             "votes",
+            "total_count",
           ]);
           const {
             author,
@@ -156,7 +158,7 @@ describe("GET /api/articles", () => {
           expect(typeof article_id).toBe("number");
           expect(typeof topic).toBe("string");
           expect(typeof created_at).toBe("string");
-          expect(typeof votes).toBe("string");
+          expect(typeof votes).toContain("string");
           expect(typeof article_img_url).toBe("string");
           expect(typeof comment_count).toBe("string");
         });
@@ -170,7 +172,7 @@ describe("GET /api/articles", () => {
         const { body } = response;
         const { articles } = body;
         const length = articles.length;
-        expect(length).toBe(5);
+        expect(length).toBe(10);
 
         const expectedSortBy = "created_at";
         const expectedOrder = { descending: true, coerce: true };
@@ -186,16 +188,16 @@ describe("GET /api/articles", () => {
         const { articles } = body;
         const actual = articles[2];
         const expected = {
-          article_id: 5,
-          title: "UNCOVERED: catspiracy to bring down democracy",
-          topic: "cats",
-          author: "rogersop",
-          created_at: "2020-08-03T13:14:00.000Z",
-          votes: "17",
-          article_img_url:
-            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-          comment_count: "2",
-        };
+          author: 'icellusedkars',
+          title: 'Sony Vaio; or, The Laptop',
+          article_id: 2,
+          topic: 'mitch',
+          created_at: '2020-10-16T05:03:00.000Z',
+          article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+          comment_count: '0',
+          votes: '0',
+          total_count: '3'
+        }
         expect(actual).toEqual(expected);
       });
   });
@@ -495,8 +497,8 @@ describe("GET /api/users", () => {
       });
   });
 });
-describe('GET /api/users?username=', () => {
-  it('GET 200: should accept a username query and return the corresponding user object which should have the following properties: username, avatar_url, name', () => {
+describe("GET /api/users?username=", () => {
+  it("GET 200: should accept a username query and return the corresponding user object which should have the following properties: username, avatar_url, name", () => {
     return request(app)
       .get("/api/users?username=icellusedkars")
       .expect(200)
@@ -505,14 +507,14 @@ describe('GET /api/users?username=', () => {
         const { users } = body;
         const length = users.length;
         const { userData } = data;
-        const expected=userData.filter(user=>{
-          return user.username==='icellusedkars'
-        })
+        const expected = userData.filter((user) => {
+          return user.username === "icellusedkars";
+        });
         expect(length).toBe(1);
         expect(users).toMatchObject(expected);
       });
   });
-  it('GET 200: should return an empty array if no such username', () => {
+  it("GET 200: should return an empty array if no such username", () => {
     return request(app)
       .get("/api/users?username=icelloo")
       .expect(200)
@@ -522,7 +524,7 @@ describe('GET /api/users?username=', () => {
         expect(users).toMatchObject([]);
       });
   });
-  it('GET 200: should return all the users if queryKey is incorrect', () => {
+  it("GET 200: should return all the users if queryKey is incorrect", () => {
     return request(app)
       .get("/api/users?nem=icel")
       .expect(200)
@@ -545,7 +547,7 @@ describe("GET /api/articles?topic=", () => {
         const { body } = response;
         const { articles } = body;
         const length = articles.length;
-        expect(length).toBe(4);
+        expect(length).toBe(10);
 
         articles.forEach((article) => {
           expect(Object.keys(article)).toEqual([
@@ -557,6 +559,7 @@ describe("GET /api/articles?topic=", () => {
             "article_img_url",
             "comment_count",
             "votes",
+            "total_count",
           ]);
           const {
             author,
@@ -608,10 +611,10 @@ describe("GET /api/articles?topic=", () => {
         const { articles } = body;
         const length = articles.length;
 
-        expect(length).toBe(5);
+        expect(length).toBe(10);
 
         articles.forEach((article) => {
-          expect(Object.keys(article).length).toBe(8);
+          expect(Object.keys(article).length).toBe(9);
           expect(Object.keys(article)).toEqual([
             "author",
             "title",
@@ -621,6 +624,7 @@ describe("GET /api/articles?topic=", () => {
             "article_img_url",
             "comment_count",
             "votes",
+            "total_count",
           ]);
           const {
             author,
@@ -644,8 +648,8 @@ describe("GET /api/articles?topic=", () => {
       });
   });
 });
-describe('GET /api/articles [sort_by, order]', () => {
-  it('GET 200: it should now accept these queries: sort_by, which sorts the articles by any valid column (defaults to the created_at date) and order, which can be set to asc or desc for ascending or descending (defaults to descending)', () => {
+describe("GET /api/articles [sort_by, order]", () => {
+  it("GET 200: it should now accept these queries: sort_by, which sorts the articles by any valid column (defaults to the created_at date) and order, which can be set to asc or desc for ascending or descending (defaults to descending)", () => {
     return request(app)
       .get("/api/articles?sort_by=votes&order=desc")
       .expect(200)
@@ -653,14 +657,14 @@ describe('GET /api/articles [sort_by, order]', () => {
         const { body } = response;
         const { articles } = body;
         const length = articles.length;
-        expect(length).toBe(5);
+        expect(length).toBe(10);
 
         const expectedSortBy = "votes";
         const expectedOrder = { descending: true, coerce: true };
         expect(articles).toBeSortedBy(expectedSortBy, expectedOrder);
       });
   });
-  it('GET 200: when all 3 queries are used', () => {
+  it("GET 200: when all 3 queries are used", () => {
     return request(app)
       .get("/api/articles?topic=mitch&sort_by=votes&order=asc")
       .expect(200)
@@ -668,7 +672,7 @@ describe('GET /api/articles [sort_by, order]', () => {
         const { body } = response;
         const { articles } = body;
         const length = articles.length;
-        expect(length).toBe(4);
+        expect(length).toBe(10);
 
         const expectedSortBy = "votes";
         const expectedOrder = { ascending: true, coerce: true };
@@ -693,7 +697,7 @@ describe("PATCH /api/comments/:comment_id", () => {
           votes: 17,
           author: "butter_bridge",
           article_id: 9,
-        }
+        };
         expect(actual).toMatchObject(expected);
       });
   });
@@ -713,7 +717,7 @@ describe("PATCH /api/comments/:comment_id", () => {
           votes: 15,
           author: "butter_bridge",
           article_id: 9,
-        }
+        };
         expect(actual).toMatchObject(expected);
       });
   });
@@ -765,4 +769,244 @@ describe("PATCH /api/comments/:comment_id", () => {
         expect(res.body.msg).toBe("Bad request");
       });
   });
-})
+});
+describe("POST /api/articles", () => {
+  it("POST 201: creates a new article with the input keys: author, title, body, topic and article_img_url. Then returns it as response with the additional keys of article_id, created_at, votes and comment_count", () => {
+    const inputBody = {
+      author: "rogersop",
+      title: "How to write a cover letter",
+      body: `Writing a cover letter involves crafting a concise, engaging document that complements your resume and highlights your suitability for the job you're applying for. Here's a step-by-step guide`,
+      topic: "mitch",
+      article_img_url:"https://images.pexels.com/photos/48195/document-agreement-documents-sign-48195.jpeg?w=700&h=700",
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(inputBody)
+      .expect(201)
+      .then(({ body }) => {
+        const { newArticle } = body;
+        const actual = newArticle;
+        const expected = {
+          author: "rogersop",
+          title: "How to write a cover letter",
+          body: `Writing a cover letter involves crafting a concise, engaging document that complements your resume and highlights your suitability for the job you're applying for. Here's a step-by-step guide`,
+          topic: "mitch",
+          article_img_url:"https://images.pexels.com/photos/48195/document-agreement-documents-sign-48195.jpeg?w=700&h=700",
+        };
+        expect(actual).toMatchObject(expected);
+        const bodyKey = actual.body;
+        const {
+          author,
+          title,
+          topic,
+          article_img_url,
+          article_id,
+          votes,
+          created_at,
+          comment_count,
+        } = actual;
+        expect(typeof article_id).toBe("number");
+        expect(typeof title).toBe("string");
+        expect(typeof topic).toBe("string");
+        expect(typeof author).toBe("string");
+        expect(typeof bodyKey).toBe("string");
+        expect(typeof created_at).toBe("string");
+        expect(typeof article_img_url).toBe("string");
+        expect(typeof comment_count).toBe("string");
+        expect(typeof votes).toBe("number");
+      });
+  });
+  it("POST 201: article_img_url should default if not provided", () => {
+    const inputBody = {
+      author: "rogersop",
+      title: "How to write a cover letter",
+      body: `Writing a cover letter involves crafting a concise, engaging document that complements your resume and highlights your suitability for the job you're applying for. Here's a step-by-step guide`,
+      topic: "mitch"
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(inputBody)
+      .expect(201)
+      .then(({ body }) => {
+        const { newArticle } = body;
+        const actual = newArticle;
+        const expected = {
+          author: "rogersop",
+          title: "How to write a cover letter",
+          body: `Writing a cover letter involves crafting a concise, engaging document that complements your resume and highlights your suitability for the job you're applying for. Here's a step-by-step guide`,
+          topic: "mitch",
+          article_img_url:default_article_img_url,
+        };
+        expect(actual).toMatchObject(expected);
+        const bodyKey = actual.body;
+        const {
+          author,
+          title,
+          topic,
+          article_img_url,
+          article_id,
+          votes,
+          created_at,
+          comment_count,
+        } = actual;
+        expect(typeof article_id).toBe("number");
+        expect(typeof title).toBe("string");
+        expect(typeof topic).toBe("string");
+        expect(typeof author).toBe("string");
+        expect(typeof bodyKey).toBe("string");
+        expect(typeof created_at).toBe("string");
+        expect(typeof article_img_url).toBe("string");
+        expect(typeof comment_count).toBe("string");
+        expect(typeof votes).toBe("number");
+      });
+  });
+  it("POST 404: if author does not exist", () => {
+    const inputBody = {
+      author: "idontexist",
+      title: "How to write a cover letter",
+      body: `Writing a cover letter involves crafting a concise, engaging document that complements your resume and highlights your suitability for the job you're applying for. Here's a step-by-step guide`,
+      topic: "mitch",
+      article_img_url:"https://images.pexels.com/photos/48195/document-agreement-documents-sign-48195.jpeg?w=700&h=700",
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(inputBody)
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid input");
+      });
+  });
+  it("POST 404: if topic does not exist", () => {
+    const inputBody = {
+      author: "rogersop",
+      title: "How to write a cover letter",
+      body: `Writing a cover letter involves crafting a concise, engaging document that complements your resume and highlights your suitability for the job you're applying for. Here's a step-by-step guide`,
+      topic: "itdoesntexist",
+      article_img_url:"https://images.pexels.com/photos/48195/document-agreement-documents-sign-48195.jpeg?w=700&h=700",
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(inputBody)
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid input");
+      });
+  });
+  it("POST 400: missing field(s) in the input body, eg. if topic is missing", () => {
+    const inputBody = {
+      author: "rogersop",
+      title: "How to write a cover letter",
+      body: `Writing a cover letter involves crafting a concise, engaging document that complements your resume and highlights your suitability for the job you're applying for. Here's a step-by-step guide`,
+      article_img_url:"https://images.pexels.com/photos/48195/document-agreement-documents-sign-48195.jpeg?w=700&h=700",
+    }
+    return request(app)
+      .post("/api/articles")
+      .send(inputBody)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad request");
+      });
+  });
+});
+describe("GET /api/articles [limit, p]", () => {
+  it("GET 200: -PAGINATION- it should now accept these queries: limit, which limits the number of responses (defaults to 10), and p, stands for page and specifies the page at which to start (calculated using limit)", () => {
+    return request(app)
+      .get("/api/articles?limit=2&p=1")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { articles } = body;
+        const length = articles.length;
+        expect(length).toBe(2);
+      });
+  });
+  it("GET 200: if limit is not provided it will default to 10", () => {
+    return request(app)
+      .get("/api/articles?p=1")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { articles } = body;
+        const length = articles.length;
+        expect(length).toBe(10);
+      });
+  });
+  it("GET 200: if limit is 3 and we want to see the 5th page", () => {
+    return request(app)
+      .get("/api/articles?limit=3&p=5")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { articles } = body;
+        const expected={
+          author: 'icellusedkars',
+          title: 'Z',
+          article_id: 7,
+          topic: 'mitch',
+          created_at: '2020-01-07T14:08:00.000Z',
+          article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+          comment_count: '0',
+          votes: '0'
+        }
+        const length = articles.length;
+        expect(length).toBe(1);
+        expect(articles[0]).toMatchObject(expected)
+      });
+  });
+  it("GET 200: the response should also include the total_count property, displaying the total number of articles (this should display the total number of articles with any filters applied, discounting the limit) ", () => {
+    return request(app)
+      .get("/api/articles?limit=2&p=4")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { articles } = body;
+        const expected={
+          author: 'butter_bridge',
+          title: "They're not exactly dogs, are they?",
+          article_id: 9,
+          topic: 'mitch',
+          created_at: '2020-06-06T09:10:00.000Z',
+          article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+          comment_count: '2',
+          votes: '36',
+          total_count: '5'
+        }
+        const length = articles.length;
+        expect(length).toBe(2);
+        expect(articles[1]).toEqual(expected)
+      });
+  });
+  it("GET 200: displays the correct total_count if a filter is applied, discounting the limit", () => {
+    return request(app)
+      .get("/api/articles?limit=2&p=4&topic=mitch")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { articles } = body;
+        const expected={
+          author: 'rogersop',
+          title: 'Seven inspirational thought leaders from Manchester UK',
+          article_id: 10,
+          topic: 'mitch',
+          created_at: '2020-05-14T04:15:00.000Z',
+          article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+          comment_count: '0',
+          votes: '0',
+          total_count: '4'
+        }
+        const length = articles.length;
+        expect(length).toBe(2);
+        expect(articles[1]).toEqual(expected)
+      });
+  });
+  it("GET 200: returns an empty array if limit has no associated articles", () => {
+    return request(app)
+      .get("/api/articles?limit=15&p=4&topic=mitch")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { articles } = body;
+        expect(articles).toEqual([]);
+      });
+  });
+});
