@@ -189,3 +189,27 @@ exports.addNewTopic = ({ slug, description }) => {
       return rows[0];
     });
 };
+
+exports.deleteArticleById = (article_id) => {
+  const queryStr = `DELETE FROM articles WHERE articles.article_id=$1 RETURNING *;`;
+  return db
+    .query(queryStr, [article_id])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Not found" });
+      }
+      const [obj] = rows;
+      const article_id2 = obj.article_id;
+      const queryStr2 = `SELECT * FROM articles WHERE article_id=$1;`;
+      return db.query(queryStr2, [article_id2]);
+    })
+    .then(({ rows }) => {
+      if (rows.length !== 0) {
+        return Promise.reject({
+          status: 418,
+          msg: "Deleted but still exists. How is this possible?",
+        });
+      }
+      return rows;
+    });
+};

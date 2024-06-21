@@ -182,5 +182,11 @@
         }
       ]
     }
+  },
+  "DELETE /api/articles/:article_id": {
+    "description": "it should delete the selected article and its related comments by article_id and respond with status 204 and no content",
+    "queries": [],
+    "parameter": ["article_id"],
+    "exampleResponse": {}
   }
 }

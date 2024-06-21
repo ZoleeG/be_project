@@ -1089,3 +1089,31 @@ describe("POST /api/topics", () => {
       });
   });
 });
+describe("DELETE /api/articles/:article_id", () => {
+  it("DELETE 204: it should delete the given article by article_id and respond with status 204 and no content", () => {
+    return request(app)
+      .delete("/api/articles/1")
+      .expect(204)
+      .then(({ body }) => {
+        expect(body).toEqual({});
+      });
+  });
+  it("DELETE 404: if path does not exist", () => {
+    return request(app)
+      .delete("/api/articles/19")
+      .expect(404)
+      .then(({ body }) => {
+        const expected = "Not found";
+        expect(body.msg).toEqual(expected);
+      });
+  });
+  it("DELETE 400: invalid path", () => {
+    return request(app)
+      .delete("/api/articles/hu")
+      .expect(400)
+      .then(({ body }) => {
+        const expected = "Bad request";
+        expect(body.msg).toEqual(expected);
+      });
+  });
+});

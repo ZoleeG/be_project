@@ -12,6 +12,7 @@ const {
   updateCommentVotesById,
   addNewArticle,
   addNewTopic,
+  deleteArticleById,
 } = require("../models");
 
 exports.getTopics = (req, res, next) => {
@@ -118,6 +119,15 @@ exports.postNewTopic = (req, res, next) => {
   addNewTopic(body)
     .then((newTopic) => {
       res.status(201).send({ newTopic });
+    })
+    .catch(next);
+};
+
+exports.removeArticleById = (req, res, next) => {
+  const { article_id } = req.params;
+  deleteArticleById(article_id)
+    .then((rows) => {
+      res.status(204).send(rows);
     })
     .catch(next);
 };
