@@ -74,7 +74,7 @@ describe("GET /api/articles/:article_id", () => {
       .expect(200)
       .then((response) => {
         const expected = {
-          comment_count: "11",
+          comment_count: 11,
         };
         const { body } = response;
         const actual = body.article;
