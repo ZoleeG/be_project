@@ -249,6 +249,35 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(actual).toBeSortedBy(expectedSortBy, expectedOrder);
       });
   });
+  it("it should accept limit and p queries, limit should default to 10", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=2&p=2")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        const { comments } = body;
+        const actual = comments;
+        const expected=[
+          {
+            comment_id: 18,
+            body: 'This morning, I showered for nine minutes.',
+            article_id: 1,
+            author: 'butter_bridge',
+            votes: 16,
+            created_at: '2020-07-21T00:20:00.000Z'
+          },
+          {
+            comment_id: 13,
+            body: 'Fruit pastilles',
+            article_id: 1,
+            author: 'icellusedkars',
+            votes: 0,
+            created_at: '2020-06-15T10:25:00.000Z'
+          }
+        ]
+        expect(actual[0]).toMatchObject(expected[0])
+      });
+  });
   it("GET 200: should respond with an empty array when the given article exists but has no comment", () => {
     return request(app)
       .get("/api/articles/8/comments")
