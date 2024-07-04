@@ -35,18 +35,19 @@ exports.selectAllArticles = (order = "DESC", sort_by = "created_at", topic, limi
 
   queryStr += " GROUP BY articles.article_id";
 
-  queryStr += format(` ORDER BY %I %s %s %s;`, sort_by, order, `LIMIT ${limit}`, `OFFSET ${skipThisManyArticles}`);
+  queryStr += format(` ORDER BY %I %s LIMIT %s OFFSET %s;`, sort_by, order, limit, skipThisManyArticles);
 
   return db.query(queryStr, queryValues).then(({rows}) => {
     return rows;
   });
 };
 
-exports.selectCommentsById = (article_id, limit=10, p=1) => {
+exports.selectCommentsById = (article_id, limit=10, p=1, sort_by='created_at', order='DESC') => {
   const skipThisManyArticles=(p-1)*limit
-  const queryStr = `SELECT * FROM comments WHERE comments.article_id = $1 ORDER BY comments.created_at DESC LIMIT $2 OFFSET $3;`;
+  let queryStr = "SELECT * FROM comments WHERE article_id = $1";
+  queryStr += format(" ORDER BY %I %s LIMIT %s OFFSET %s;", sort_by, order, limit, skipThisManyArticles)
 
-  return db.query(queryStr, [article_id, limit, skipThisManyArticles]).then(({ rows }) => {
+  return db.query(queryStr, [article_id]).then(({ rows }) => {
     return rows;
   });
 };
