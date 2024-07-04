@@ -44,7 +44,7 @@ exports.selectAllArticles = (order = "DESC", sort_by = "created_at", topic, limi
 
 exports.selectCommentsById = (article_id, limit=10, p=1, sort_by='created_at', order='DESC') => {
   const skipThisManyArticles=(p-1)*limit
-  let queryStr = "SELECT * FROM comments WHERE article_id = $1";
+  let queryStr = "SELECT * , LENGTH(body)::INT AS body_length FROM comments WHERE article_id = $1";
   queryStr += format(" ORDER BY %I %s LIMIT %s OFFSET %s;", sort_by, order, limit, skipThisManyArticles)
 
   return db.query(queryStr, [article_id]).then(({ rows }) => {

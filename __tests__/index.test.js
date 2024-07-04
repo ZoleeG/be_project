@@ -216,7 +216,7 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(length).toBe(2);
 
         comments.forEach((comment) => {
-          expect(Object.keys(comment).length).toBe(6);
+          expect(Object.keys(comment).length).toBe(7);
           expect(Object.keys(comment)).toEqual([
             "comment_id",
             "body",
@@ -224,6 +224,7 @@ describe("GET /api/articles/:article_id/comments", () => {
             "author",
             "votes",
             "created_at",
+            "body_length",
           ]);
           const { comment_id, votes, created_at, author, body, article_id } =
             comment;
@@ -1061,7 +1062,7 @@ describe("GET /api/articles/:article_id/comments [limit, p]", () => {
         expect(length).toBe(11);
 
         comments.forEach((comment) => {
-          expect(Object.keys(comment).length).toBe(6);
+          expect(Object.keys(comment).length).toBe(7);
           expect(Object.keys(comment)).toEqual([
             "comment_id",
             "body",
@@ -1069,6 +1070,7 @@ describe("GET /api/articles/:article_id/comments [limit, p]", () => {
             "author",
             "votes",
             "created_at",
+            "body_length"
           ]);
           const { comment_id, votes, created_at, author, body, article_id } =
             comment;
