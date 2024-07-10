@@ -7,8 +7,7 @@ const {
 } = require('./utils');
 
 const seed = ({ topicData, userData, articleData, commentData }) => {
-  return db
-    .query(`DROP TABLE IF EXISTS comments;`)
+    return db.query(`DROP TABLE IF EXISTS comments;`)
     .then(() => {
       return db.query(`DROP TABLE IF EXISTS articles;`);
     })
@@ -39,8 +38,8 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       CREATE TABLE articles (
         article_id SERIAL PRIMARY KEY,
         title VARCHAR NOT NULL,
-        topic VARCHAR NOT NULL REFERENCES topics(slug),
-        author VARCHAR NOT NULL REFERENCES users(username),
+        topic VARCHAR REFERENCES topics(slug) ON DELETE CASCADE NOT NULL,
+        author VARCHAR REFERENCES users(username) NOT NULL,
         body VARCHAR NOT NULL,
         created_at TIMESTAMP DEFAULT NOW(),
         votes INT DEFAULT 0 NOT NULL,

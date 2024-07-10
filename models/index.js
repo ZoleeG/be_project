@@ -214,3 +214,15 @@ exports.deleteArticleById = (article_id) => {
       return rows;
     });
 };
+
+exports.deleteTopicBySlug = (slug) => {
+  const queryStr = `DELETE FROM topics WHERE topics.slug=$1 RETURNING *;`;
+  return db
+    .query(queryStr, [slug])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Not found" });
+      }
+      return rows;
+    });
+};

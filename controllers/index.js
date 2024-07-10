@@ -13,6 +13,7 @@ const {
   addNewArticle,
   addNewTopic,
   deleteArticleById,
+  deleteTopicBySlug,
 } = require("../models");
 
 exports.getTopics = (req, res, next) => {
@@ -126,6 +127,15 @@ exports.postNewTopic = (req, res, next) => {
 exports.removeArticleById = (req, res, next) => {
   const { article_id } = req.params;
   deleteArticleById(article_id)
+    .then((rows) => {
+      res.status(204).send(rows);
+    })
+    .catch(next);
+};
+
+exports.removeTopicBySlug = (req, res, next) => {
+  const { slug } = req.params;
+  deleteTopicBySlug(slug)
     .then((rows) => {
       res.status(204).send(rows);
     })

@@ -258,25 +258,25 @@ describe("GET /api/articles/:article_id/comments", () => {
         const { body } = response;
         const { comments } = body;
         const actual = comments;
-        const expected=[
+        const expected = [
           {
             comment_id: 18,
-            body: 'This morning, I showered for nine minutes.',
+            body: "This morning, I showered for nine minutes.",
             article_id: 1,
-            author: 'butter_bridge',
+            author: "butter_bridge",
             votes: 16,
-            created_at: '2020-07-21T00:20:00.000Z'
+            created_at: "2020-07-21T00:20:00.000Z",
           },
           {
             comment_id: 13,
-            body: 'Fruit pastilles',
+            body: "Fruit pastilles",
             article_id: 1,
-            author: 'icellusedkars',
+            author: "icellusedkars",
             votes: 0,
-            created_at: '2020-06-15T10:25:00.000Z'
-          }
-        ]
-        expect(actual[0]).toMatchObject(expected[0])
+            created_at: "2020-06-15T10:25:00.000Z",
+          },
+        ];
+        expect(actual[0]).toMatchObject(expected[0]);
       });
   });
   it("GET 200: should respond with an empty array when the given article exists but has no comment", () => {
@@ -1070,7 +1070,7 @@ describe("GET /api/articles/:article_id/comments [limit, p]", () => {
             "author",
             "votes",
             "created_at",
-            "body_length"
+            "body_length",
           ]);
           const { comment_id, votes, created_at, author, body, article_id } =
             comment;
@@ -1144,6 +1144,33 @@ describe("DELETE /api/articles/:article_id", () => {
       .expect(400)
       .then(({ body }) => {
         const expected = "Bad request";
+        expect(body.msg).toEqual(expected);
+      });
+  });
+});
+describe("DELETE /api/topics/:slug", () => {
+  it("DELETE 204: it should delete the chosen topic by topic.slug and all the articles with that topic and respond with status 204 and no content", () => {
+    return request(app)
+      .delete("/api/topics/cats")
+      .expect(204)
+      .then(() => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then((response) => {
+            const { body } = response;
+            const { articles } = body;
+            const length = articles.length;
+            expect(length).toBe(10);
+          });
+      });
+  });
+  it("DELETE 404: if path does not exist", () => {
+    return request(app)
+      .delete("/api/topics/doesnotexist")
+      .expect(404)
+      .then(({ body }) => {
+        const expected = "Not found";
         expect(body.msg).toEqual(expected);
       });
   });

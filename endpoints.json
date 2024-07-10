@@ -26,7 +26,7 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles sorted by date in descending order, where each article has the attributes as shown in below example",
+    "description": "serves an array of all articles sorted by date in descending order by default, where each article has the attributes as shown in below example",
     "queries": ["topic", "sort_by", "order", "limit", "p"],
     "exampleResponse": {
       "articles": [
@@ -187,6 +187,12 @@
     "description": "it should delete the selected article and its related comments by article_id and respond with status 204 and no content",
     "queries": [],
     "parameter": ["article_id"],
+    "exampleResponse": {}
+  },
+  "DELETE /api/topics/:slug": {
+    "description": "it should delete the selected topic and related articles by topic.slug and respond with status 204 and no content",
+    "queries": [],
+    "parameter": ["topic.slug"],
     "exampleResponse": {}
   }
 }
