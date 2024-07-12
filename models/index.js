@@ -176,6 +176,11 @@ exports.addNewArticle = ({ author, title, body, topic, article_img_url=this.defa
 };
 
 exports.addNewTopic = ({ slug, description }) => {
+  if(!slug || !description){
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }else if(!slug.length || !description.length){
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
 
   const queryStr = format(
     `INSERT INTO topics (slug, description) VALUES %L RETURNING *;`,

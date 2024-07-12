@@ -1119,6 +1119,19 @@ describe("POST /api/topics", () => {
         expect(res.body.msg).toBe("Bad request");
       });
   });
+  it("POST 400: If empty strings in the input body", () => {
+    const inputBody = {
+      slug: "",
+      description: "",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(inputBody)
+      .expect(400)
+      .then((res) => {        
+        expect(res.body.msg).toBe("Bad request");
+      });
+  });
 });
 describe("DELETE /api/articles/:article_id", () => {
   it("DELETE 204: it should delete the given article by article_id and respond with status 204 and no content", () => {
